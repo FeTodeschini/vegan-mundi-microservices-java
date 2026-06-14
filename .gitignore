@@ -1,0 +1,66 @@
+# Build artifacts
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+pom.xml.tag
+pom.xml.releaseBackup
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.c9/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+terraform.tfvars.local
+crash.log
+override.tf.json
+*_override.tf.json
+
+# Node/NPM (if using any Node tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+
+# Gradle
+.gradle/
+gradle/
+gradlew
+gradlew.bat

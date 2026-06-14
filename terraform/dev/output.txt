@@ -1,0 +1,30 @@
+"UserId": "AIDATCKAM7Y7XLOEH5QIK",
+"Account": "211125337663",
+"Arn": "arn:aws:iam::211125337663:user/admin"
+
+
+aws s3 mb s3://%NEW_TF_STATE_BUCKET% --region %AWS_REGION%
+make_bucket: vegan-mundi-tf-state-211125337663-us-east-2
+
+
+alb_arn = "arn:aws:elasticloadbalancing:us-east-2:211125337663:loadbalancer/app/vegan-mundi-dev-alb/85c4553a15262fac"
+alb_dns_name = "vegan-mundi-dev-alb-865316294.us-east-2.elb.amazonaws.com"
+cloudwatch_log_group = "/ecs/vegan-mundi-dev"
+ecr_repository_urls = {
+  "account-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-account-service"
+  "class-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-class-service"
+  "delivery-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-delivery-service"
+  "gallery-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-gallery-service"
+  "order-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-order-service"
+  "price-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-price-service"
+  "review-service" = "211125337663.dkr.ecr.us-east-2.amazonaws.com/vegan-mundi-review-service"
+}
+ecs_cluster_arn = "arn:aws:ecs:us-east-2:211125337663:cluster/vegan-mundi-dev-cluster"
+ecs_cluster_name = "vegan-mundi-dev-cluster"
+eventbridge_rule_arn = "arn:aws:events:us-east-2:211125337663:rule/vegan-mundi-dev-order-created"
+lambda_function_arn = "arn:aws:lambda:us-east-2:211125337663:function:vegan-mundi-order-confirmation-dev"
+private_subnet_ids = [
+  "subnet-04a2ab0ecff85905c",
+  "subnet-036612f39b087b310",
+]
+vpc_id = "vpc-02aa1c324f945682e"

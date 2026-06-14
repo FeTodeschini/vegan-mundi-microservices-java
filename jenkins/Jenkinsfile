@@ -1,0 +1,227 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['test', 'prod'], description: 'Target cloud environment')
+        string(name: 'AWS_ACCOUNT_ID', defaultValue: '211125337663', description: 'AWS account ID used for ECR registry URI')
+        string(name: 'TF_STATE_BUCKET', defaultValue: 'vegan-mundi-tf-state-211125337663-us-east-2', description: 'S3 bucket used for Terraform remote state')
+        booleanParam(name: 'RUN_TERRAFORM', defaultValue: false, description: 'Run Terraform plan/apply stages in this pipeline execution')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip unit tests')
+        booleanParam(name: 'DRY_RUN', defaultValue: false, description: 'Terraform plan only (no apply)')
+    }
+
+    environment {
+        AWS_REGION = 'us-east-2'
+        REGISTRY = "${params.AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        REGISTRY_URL = "https://${REGISTRY}"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Validate Inputs') {
+            steps {
+                script {
+                    if (!params.AWS_ACCOUNT_ID?.trim()) {
+                        error('AWS_ACCOUNT_ID is required')
+                    }
+                    if (!params.TF_STATE_BUCKET?.trim()) {
+                        error('TF_STATE_BUCKET is required')
+                    }
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                script {
+                    sh '''
+                        echo "Building all services..."
+                        if [ "${SKIP_TESTS}" = "false" ]; then
+                            mvn clean package
+                        else
+                            mvn clean package -DskipTests
+                        fi
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                script {
+                    sh '''
+                        echo "Logging into ECR..."
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
+                        
+                        echo "Building Docker images..."
+                        SERVICES=("account-service" "class-service" "order-service" "review-service" "delivery-service" "gallery-service" "price-service")
+                        
+                        for service in "${SERVICES[@]}"; do
+                            echo "Building ${service}..."
+                            docker build -t ${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG} services/${service}/
+                            docker tag ${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG} ${REGISTRY}/vegan-mundi-${service}:latest
+                            
+                            echo "Pushing to ECR..."
+                            docker push ${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG}
+                            docker push ${REGISTRY}/vegan-mundi-${service}:latest
+                        done
+                    '''
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            when {
+                expression { params.RUN_TERRAFORM == true }
+            }
+            steps {
+                script {
+                    sh '''
+                        cd terraform/${ENVIRONMENT}
+                        terraform init -reconfigure \
+                          -backend-config="bucket=${TF_STATE_BUCKET}" \
+                          -backend-config="key=vegan-mundi/${ENVIRONMENT}/terraform.tfstate" \
+                          -backend-config="region=${AWS_REGION}" \
+                          -backend-config="encrypt=true"
+                        terraform plan -out=tfplan -var-file=terraform.tfvars
+                        terraform show -no-color tfplan > tfplan.txt
+                    '''
+                }
+            }
+        }
+
+        stage('Review & Approve') {
+            when {
+                expression { params.RUN_TERRAFORM == true && params.DRY_RUN == false }
+            }
+            steps {
+                input message: 'Review Terraform plan. Approve to continue?', ok: 'Deploy'
+            }
+        }
+
+        stage('Terraform Apply') {
+            when {
+                expression { params.RUN_TERRAFORM == true && params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    sh '''
+                        cd terraform/${ENVIRONMENT}
+                        terraform apply -auto-approve tfplan
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to ECS') {
+            when {
+                expression { params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    sh '''
+                        echo "Deploying services to ECS..."
+                        SERVICES=("account-service" "class-service" "order-service" "review-service" "delivery-service" "gallery-service" "price-service")
+                        CLUSTER="vegan-mundi-${ENVIRONMENT}-cluster"
+                        
+                        for service in "${SERVICES[@]}"; do
+                            echo "Updating ${service} on ${CLUSTER}..."
+                            
+                            # Get current task definition
+                            TASK_DEFINITION=$(aws ecs describe-services \
+                                --cluster ${CLUSTER} \
+                                --services vegan-mundi-${service}-service \
+                                --query 'services[0].taskDefinition' \
+                                --output text)
+                            
+                            # Register new task definition with updated image
+                            NEW_TASK_DEF=$(aws ecs describe-task-definition \
+                                --task-definition ${TASK_DEFINITION} \
+                                --query 'taskDefinition' \
+                                | jq ".containerDefinitions[0].image = \\"${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG}\\"" \
+                                | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes)')
+                            
+                            REGISTERED_TASK=$(aws ecs register-task-definition \
+                                --cli-input-json "file:///dev/stdin" \
+                                <<< "${NEW_TASK_DEF}" \
+                                --query 'taskDefinition.taskDefinitionArn' \
+                                --output text)
+                            
+                            # Update service
+                            aws ecs update-service \
+                                --cluster ${CLUSTER} \
+                                --service vegan-mundi-${service}-service \
+                                --task-definition ${REGISTERED_TASK} \
+                                --force-new-deployment
+                        done
+                    '''
+                }
+            }
+        }
+
+        stage('Smoke Tests') {
+            when {
+                expression { params.DRY_RUN == false }
+            }
+            steps {
+                script {
+                    sh '''
+                        echo "Running smoke tests..."
+                        sleep 30  # Wait for services to stabilize
+                        
+                        # Get ALB DNS
+                        ALB_DNS=$(aws elbv2 describe-load-balancers \
+                            --query "LoadBalancers[?contains(LoadBalancerName, 'vegan-mundi-${ENVIRONMENT}')].DNSName" \
+                            --output text)
+                        
+                        # Test endpoints
+                        echo "Testing account-service health..."
+                        curl -f http://${ALB_DNS}/api/account/health || exit 1
+                        
+                        echo "Testing class-service health..."
+                        curl -f http://${ALB_DNS}/api/classes/health || exit 1
+                        
+                        echo "Testing order-service health..."
+                        curl -f http://${ALB_DNS}/api/orders/health || exit 1
+                        
+                        echo "✓ All smoke tests passed"
+                    '''
+                }
+            }
+        }
+
+        stage('Rollback on Failure') {
+            when {
+                failure()
+            }
+            steps {
+                script {
+                    sh '''
+                        echo "⚠️ Deployment failed, initiating rollback..."
+                        bash jenkins/scripts/rollback.sh ${ENVIRONMENT}
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+
+        success {
+            echo "✅ Deployment successful to ${ENVIRONMENT}"
+        }
+
+        failure {
+            echo "❌ Deployment failed to ${ENVIRONMENT}"
+        }
+    }
+}

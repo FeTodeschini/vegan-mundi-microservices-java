@@ -1,0 +1,6 @@
+-- Optional seed script for initial reference data.
+-- Keep this file idempotent where possible.
+-- Example:
+-- INSERT INTO PAYMENT_METHOD (PAYMENT_METHOD_ID, DESCRIPTION)
+-- VALUES ('CRC', 'Credit Card')
+-- ON DUPLICATE KEY UPDATE DESCRIPTION = VALUES(DESCRIPTION);
