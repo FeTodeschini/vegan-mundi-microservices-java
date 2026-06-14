@@ -15,7 +15,6 @@ max_capacity      = 6
 
 # Database
 db_username = "admin"
-# db_password = "ChangeMe123!"  # Set via TF_VAR_db_password or pipeline secret
 db_name                    = "vegan_mundi_prod"
 db_instance_class          = "db.t3.micro"
 db_allocated_storage       = 20

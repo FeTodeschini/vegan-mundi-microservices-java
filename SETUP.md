@@ -98,7 +98,7 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=vegan_mundi_dev
 DB_USER=root
-DB_PASSWORD=your_secure_password
+DB_PASSWORD=vegan_password
 
 # Service Ports
 ACCOUNT_SERVICE_PORT=8001
