@@ -35,8 +35,8 @@ cd vegan-mundi-microservices-java
 # Build all services
 mvn clean package
 
-# Run locally with Docker Compose
-docker-compose -f docker/docker-compose.local.yml up
+# Run locally (start services against your local MySQL)
+mvn clean package
 ```
 
 ## 📁 Project Structure

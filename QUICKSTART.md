@@ -7,8 +7,12 @@
 git clone https://github.com/your-org/vegan-mundi-microservices-java.git
 cd vegan-mundi-microservices-java
 
-# Start MySQL
-docker-compose -f docker/mysql/docker-compose.yml up -d
+# Start local MySQL service (native installation)
+# macOS
+brew services start mysql
+
+# Windows (Service name may vary)
+net start MySQL80
 
 # Build all services
 mvn clean package
@@ -29,8 +33,8 @@ curl http://localhost:8001/health
 
 - **Java 17 LTS**: `java -version` → `openjdk 17.x.x`
 - **Maven 3.8.1+**: `mvn -version`
-- **Docker & Docker Compose**: `docker --version` && `docker-compose --version`
-- **MySQL 8.0**: Provided via Docker, no local install needed
+- **Docker**: `docker --version`
+- **MySQL 8.0**: Local/native installation
 - **Git**: `git --version`
 - **AWS CLI v2** (optional, for deployments): `aws --version`
 
@@ -96,14 +100,15 @@ cd vegan-mundi-microservices-java
 ### 7. Start MySQL
 
 ```bash
-# Navigate to MySQL docker directory
-cd docker/mysql
+# Start local MySQL service (examples)
+# macOS
+brew services start mysql
 
-# Start container
-docker-compose up -d
+# Linux (systemd)
+sudo systemctl start mysql
 
-# Verify MySQL is running
-docker ps | grep mysql
+# Windows (Service name may vary)
+net start MySQL80
 
 # Connect to MySQL (password: vegan_password)
 mysql -h 127.0.0.1 -u vegan_user -p
@@ -117,9 +122,6 @@ SHOW TABLES;
 ### 8. Build Project
 
 ```bash
-# Navigate to project root
-cd ../..
-
 # Full build (runs tests)
 mvn clean package
 
@@ -266,11 +268,15 @@ mvn clean package
 
 ### MySQL Connection Refused
 ```bash
-# Check if MySQL container is running
-docker ps | grep mysql
+# Check local MySQL service status
+# macOS
+brew services list | grep mysql
 
-# Restart container
-docker-compose -f docker/mysql/docker-compose.yml restart
+# Linux
+sudo systemctl status mysql
+
+# Windows
+sc query MySQL80
 ```
 
 ### Port Already in Use
@@ -339,7 +345,7 @@ mvn dependency:tree -pl services/account-service
 
 1. **Start MySQL**:
    ```bash
-   docker-compose -f docker/mysql/docker-compose.yml up -d
+   # Start local MySQL service using your OS service manager
    ```
 
 2. **Build all services**:

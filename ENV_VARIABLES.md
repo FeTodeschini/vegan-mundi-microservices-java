@@ -66,8 +66,8 @@ AWS_LAMBDA_LOG_LEVEL=INFO
 
 ### Local Development
 ```bash
-# Terminal 1: MySQL
-docker-compose -f docker/mysql/docker-compose.yml up -d
+# Terminal 1: MySQL (native/local)
+# Start the MySQL service using your OS service manager first
 
 # Terminal 2: Build
 mvn clean package -DskipTests

@@ -93,7 +93,7 @@ AWS_PROFILE=default  # or your profile name
 APP_ENV=local
 LOG_LEVEL=INFO
 
-# Database (MySQL on EC2 or local)
+# Database (local MySQL for dev; RDS for test/prod)
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=vegan_mundi_dev
@@ -125,22 +125,7 @@ mvn clean package -DskipTests
 
 ### 4. Set Up Local MySQL
 
-Option A: Using Docker
-
-```bash
-# Start MySQL container
-docker run -d \
-  --name vegan-mundi-mysql \
-  -e MYSQL_ROOT_PASSWORD=root \
-  -e MYSQL_DATABASE=vegan_mundi_dev \
-  -p 3306:3306 \
-  mysql:8.0
-
-# Verify
-docker ps | grep mysql
-```
-
-Option B: Local Installation
+Use your native/local MySQL installation for development.
 
 ```bash
 # Install MySQL (macOS with Homebrew)

@@ -160,10 +160,7 @@ vegan-mundi-microservices-java/
 │   └── docker-compose.yml             # Local Jenkins setup
 │
 ├── docker/                            # Container configs
-│   ├── base/                          # Base image with common dependencies
-│   │   └── Dockerfile
-│   └── mysql/                         # MySQL on EC2 (optional setup)
-│       └── docker-compose.yml
+│   └── service-images/                # Service Dockerfiles (under each service folder)
 │
 ├── docs/                              # Documentation & architecture
 │   ├── ARCHITECTURE.md                # Detailed architecture diagrams & flow

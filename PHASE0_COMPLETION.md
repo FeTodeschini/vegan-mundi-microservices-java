@@ -99,7 +99,7 @@ All modules have proper variable/output contracts.
   - Automatic rollback on failure
 - **Docker Support**:
   - Jenkins Dockerfile with Java 17, Maven 3.9, Terraform, AWS CLI v2
-  - Base Dockerfile for services (JDK 17, health checks)
+  - Service-specific Dockerfiles for each microservice
 - **Build Scripts**:
   - build.sh - Maven compilation
   - deploy.sh - ECS service updates
@@ -108,14 +108,12 @@ All modules have proper variable/output contracts.
   - test.sh - Test runner
 
 ### 9. Docker Configuration ✅
-- Base Dockerfile for microservices
-  - JDK 17 Alpine (minimal)
-  - Health checks
-  - Graceful shutdown
-- docker-compose.yml for MySQL
-  - MySQL 8.0 container
-  - Volume persistence
-  - Health check configuration
+- Service-specific Dockerfiles for microservices
+  - Java 17 runtime per service image
+  - Per-service JAR packaging
+- Local MySQL for development
+  - Native service on developer machine
+  - RDS for test/prod environments
 
 ### 10. GitHub Copilot Agents ✅
 - **README.md** - Index, quick reference table, prerequisites, cost savings
@@ -142,7 +140,7 @@ All agents include AWS CLI commands, instructions, and output templates.
   - Prerequisites
   - Installation instructions (Java 17, Maven)
   - Environment variables
-  - Database setup (MySQL Docker)
+  - Database setup (local MySQL)
   - Build & run instructions
   - IDE setup (IntelliJ, VS Code)
   - Troubleshooting guide
@@ -241,8 +239,8 @@ mvn clean package
 
 ### 2. Start MySQL
 ```bash
-docker-compose -f docker/mysql/docker-compose.yml up -d
-# Expected: MySQL container running on port 3306
+# Start local MySQL service (native installation)
+# Expected: MySQL listening on port 3306
 ```
 
 ### 3. Run Account Service

@@ -254,8 +254,8 @@ mvn test -X
 # Run single test
 mvn test -Dtest=ClassName#methodName
 
-# Clear test database
-docker-compose -f docker/mysql/docker-compose.yml restart
+# Clear test database (example)
+mysql -h localhost -u vegan_user -p -e "DROP DATABASE IF EXISTS vegan_mundi_dev; CREATE DATABASE vegan_mundi_dev;"
 ```
 
 ### Build issues
