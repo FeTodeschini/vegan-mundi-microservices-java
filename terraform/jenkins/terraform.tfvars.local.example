@@ -1,0 +1,26 @@
+# Local-only values for tools stack.
+# Copy to terraform.tfvars.local and keep it uncommitted.
+
+aws_region       = "us-east-2"
+environment      = "tools"
+vpc_id           = "vpc-xxxxxxxxxxxxxxxxx"
+public_subnet_id = "subnet-xxxxxxxxxxxxxxxxx"
+
+instance_type    = "t3.small"
+key_name         = ""
+root_volume_size = 40
+create_eip       = true
+jenkins_port     = 8080
+
+allowed_ssh_cidrs     = ["x.x.x.x/32"]
+allowed_jenkins_cidrs = ["x.x.x.x/32"]
+
+repo_url    = ""
+repo_branch = "main"
+
+attach_policy_arns = [
+  "arn:aws:iam::aws:policy/PowerUserAccess",
+  "arn:aws:iam::aws:policy/IAMFullAccess",
+  "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+  "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+]

@@ -4,13 +4,13 @@ output "alb_dns_name" {
 }
 
 output "vpc_id" {
-  value       = module.vpc.vpc_id
-  description = "VPC ID"
+  value       = var.vpc_id
+  description = "VPC ID used by prod stack"
 }
 
 output "private_subnet_ids" {
-  value       = module.vpc.private_subnet_ids
-  description = "Private subnet IDs"
+  value       = var.private_subnet_ids
+  description = "Private subnet IDs used by prod stack"
 }
 
 output "alb_arn" {

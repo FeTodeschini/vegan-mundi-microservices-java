@@ -1,0 +1,22 @@
+jenkins:
+  systemMessage: "Vegan Mundi Jenkins - Managed by Configuration as Code"
+  numExecutors: 2
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_ID}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+
+tool:
+  git:
+    installations:
+      - name: "Default"
+        home: "git"

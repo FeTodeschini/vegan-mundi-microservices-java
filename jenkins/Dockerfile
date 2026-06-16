@@ -45,14 +45,14 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws
 RUN curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-25.0.0.tgz | \
     tar xz -C /usr/local/bin --strip-components=1 docker/docker
 
+# Pre-install Jenkins plugins used by pipeline/JCasC
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
+
 # Switch back to jenkins user
 USER jenkins
 
 # Set working directory
 WORKDIR /var/jenkins_home
-
-# Copy groovy scripts and plugins if needed
-# COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-# RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
 
 EXPOSE 8080

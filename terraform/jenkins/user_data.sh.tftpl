@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euxo pipefail
+
+dnf update -y
+dnf install -y docker git docker-compose-plugin
+
+systemctl enable --now docker
+usermod -aG docker ec2-user
+
+mkdir -p /opt/jenkins
+chown -R ec2-user:ec2-user /opt/jenkins
+
+echo "Bootstrap complete. Install repo and start Jenkins compose manually if needed." > /opt/jenkins/README_BOOTSTRAP.txt
+
+%{ if repo_url != "" ~}
+su - ec2-user -c 'if [ ! -d /opt/jenkins/vegan-mundi-java ]; then git clone --branch ${repo_branch} ${repo_url} /opt/jenkins/vegan-mundi-java; fi'
+su - ec2-user -c 'cd /opt/jenkins/vegan-mundi-java/jenkins && docker compose up -d --build'
+%{ endif ~}

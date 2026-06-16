@@ -89,7 +89,13 @@ pipeline {
                           -backend-config="key=vegan-mundi/${ENVIRONMENT}/terraform.tfstate" \
                           -backend-config="region=${AWS_REGION}" \
                           -backend-config="encrypt=true"
-                        terraform plan -out=tfplan -var-file=terraform.tfvars
+
+                        TF_LOCAL_ARGS=""
+                        if [ -f terraform.tfvars.local ]; then
+                            TF_LOCAL_ARGS="-var-file=terraform.tfvars.local"
+                        fi
+
+                        terraform plan -out=tfplan -var-file=terraform.tfvars ${TF_LOCAL_ARGS}
                         terraform show -no-color tfplan > tfplan.txt
                     '''
                 }

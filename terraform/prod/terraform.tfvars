@@ -2,10 +2,10 @@
 environment = "prod"
 aws_region  = "us-east-2"
 
-# Networking
-vpc_cidr               = "10.1.0.0/16"
-availability_zones    = ["us-east-2a", "us-east-2b"]
-enable_nat            = true
+# Networking (from terraform/network/prod outputs)
+vpc_id             = "vpc-REPLACE_ME"
+public_subnet_ids  = ["subnet-PUBLIC-1", "subnet-PUBLIC-2"]
+private_subnet_ids = ["subnet-PRIVATE-1", "subnet-PRIVATE-2"]
 
 # Compute
 instance_type     = "t3.small"
@@ -28,10 +28,3 @@ db_seed_file               = "../../db/seed/seed.sql"
 # TLS
 enable_https    = true
 # certificate_arn = "arn:aws:acm:us-east-2:123456789:certificate/xxxxx"
-
-# Tags
-tags = {
-  CostCenter = "Engineering"
-  Owner      = "DevOps"
-  Backup     = "Daily"
-}

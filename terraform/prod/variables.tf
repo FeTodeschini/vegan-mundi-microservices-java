@@ -9,14 +9,19 @@ variable "environment" {
   description = "Environment name (dev, test, prod)"
 }
 
-variable "vpc_cidr" {
+variable "vpc_id" {
   type        = string
-  description = "CIDR block for VPC"
+  description = "Existing VPC ID for prod deployment"
 }
 
-variable "availability_zones" {
+variable "public_subnet_ids" {
   type        = list(string)
-  description = "Availability zones for the region"
+  description = "Existing public subnet IDs used by ALB"
+}
+
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "Existing private subnet IDs used by ECS/RDS"
 }
 
 variable "instance_type" {
@@ -37,11 +42,6 @@ variable "min_capacity" {
 variable "max_capacity" {
   type        = number
   description = "Maximum number of EC2 instances"
-}
-
-variable "enable_nat" {
-  type        = bool
-  description = "Enable NAT Gateway for private subnet internet access"
 }
 
 variable "enable_https" {
