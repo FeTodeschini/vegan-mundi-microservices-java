@@ -34,6 +34,7 @@ Thumbs.db
 .terraform/
 *.tfstate
 *.tfstate.*
+*.tfplan
 .terraform.lock.hcl
 terraform.tfvars.local
 crash.log
