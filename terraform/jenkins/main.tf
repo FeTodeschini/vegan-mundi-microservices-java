@@ -2,6 +2,10 @@ data "aws_ssm_parameter" "al2023_ami" {
   name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
 }
 
+locals {
+  resource_prefix = "vegan-mundi-${var.environment}"
+}
+
 data "aws_iam_policy_document" "jenkins_assume" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -14,7 +18,7 @@ data "aws_iam_policy_document" "jenkins_assume" {
 }
 
 resource "aws_iam_role" "jenkins" {
-  name               = "vegan-mundi-${var.environment}-jenkins-host-role"
+  name               = "${local.resource_prefix}-host-role"
   assume_role_policy = data.aws_iam_policy_document.jenkins_assume.json
 }
 
@@ -26,12 +30,12 @@ resource "aws_iam_role_policy_attachment" "jenkins" {
 }
 
 resource "aws_iam_instance_profile" "jenkins" {
-  name = "vegan-mundi-${var.environment}-jenkins-host-profile"
+  name = "${local.resource_prefix}-host-profile"
   role = aws_iam_role.jenkins.name
 }
 
 resource "aws_security_group" "jenkins" {
-  name        = "vegan-mundi-${var.environment}-jenkins-sg"
+  name        = "${local.resource_prefix}-sg"
   description = "Security group for Jenkins host"
   vpc_id      = var.vpc_id
 
@@ -87,7 +91,7 @@ resource "aws_instance" "jenkins" {
   })
 
   tags = {
-    Name = "vegan-mundi-${var.environment}-jenkins"
+    Name = local.resource_prefix
   }
 }
 
@@ -97,6 +101,6 @@ resource "aws_eip" "jenkins" {
   instance = aws_instance.jenkins.id
 
   tags = {
-    Name = "vegan-mundi-${var.environment}-jenkins-eip"
+    Name = "${local.resource_prefix}-eip"
   }
 }

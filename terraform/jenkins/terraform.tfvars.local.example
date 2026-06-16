@@ -2,7 +2,7 @@
 # Copy to terraform.tfvars.local and keep it uncommitted.
 
 aws_region       = "us-east-2"
-environment      = "tools"
+environment      = "jenkins"
 vpc_id           = "vpc-xxxxxxxxxxxxxxxxx"
 public_subnet_id = "subnet-xxxxxxxxxxxxxxxxx"
 
