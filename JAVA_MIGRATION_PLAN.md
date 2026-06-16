@@ -8,7 +8,7 @@ Migrate Vegan Mundi from Node.js to Java microservices on AWS ECS (EC2), with AL
 ## Architecture Decisions
 
 ### Data & Auth
-- **Primary DB**: MySQL on EC2 (cost optimization; production target is RDS)
+- **Primary DB**: MySQL on RDS
 - **Auth**: Stateless JWT with signature validation only (no DynamoDB token storage)
 - **No DynamoDB**: Not needed for core workload; added complexity without benefit for this scope
 - **Event Bus**: EventBridge for domain events (optional; start without if scope is tight)
