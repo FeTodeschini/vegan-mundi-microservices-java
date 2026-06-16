@@ -23,15 +23,15 @@ Migrate Vegan Mundi from Node.js to Java microservices on AWS ECS (EC2), with AL
 - **Terraform**: All infrastructure as code (remote state in S3)
 - **Jenkins**: CI/CD pipeline (build, test, deploy)
 - **ECR**: Container registry for Java services
-- **Environments**: dev and prod via Terraform workspaces or directories
+- **Environments**: dev is local. test and prod via Terraform workspaces or directories
 
-### Lambda Showcase Feature
+### Lambda Feature
 - **Trigger**: OrderCreated event (via EventBridge or simple SNS)
 - **Function**: Send order confirmation email + write lightweight analytics record
 - **Stack**: Java Spring Boot service publishes event → Lambda consumes → SES email + DynamoDB analytics
 - **Interview Value**: Demonstrates hybrid container + serverless, event-driven patterns
 
-### AWS CLI Showcase Opportunities
+### AWS CLI Opportunities
 - Query ECS task health and logs
 - Publish test events to EventBridge
 - Trigger one-off ECS tasks for DB migrations
