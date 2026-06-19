@@ -128,7 +128,7 @@ resource "aws_db_subnet_group" "main" {
 }
 
 resource "aws_db_instance" "main" {
-  identifier              = "vegan-mundi-${var.environment}-mysql"
+  identifier              = "vegan-mundi-${var.environment}"
   engine                  = "mysql"
   engine_version          = "8.0"
   instance_class          = var.db_instance_class
@@ -145,7 +145,7 @@ resource "aws_db_instance" "main" {
   apply_immediately       = true
 
   tags = {
-    Name        = "vegan-mundi-${var.environment}-mysql"
+    Name        = "vegan-mundi-${var.environment}"
     Environment = var.environment
   }
 }
