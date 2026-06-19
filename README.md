@@ -8,7 +8,7 @@ A complete migration of Vegan Mundi from Node.js to Java microservices, deployed
 - **Infrastructure**: AWS (VPC, ALB, ECS, ECR, RDS/MySQL, Lambda, EventBridge)
 - **IaC**: Terraform with modular structure
 - **CI/CD**: Jenkins with automated testing and deployment
-- **Database**: MySQL (EC2 hosted for dev cost control; RDS recommended for production)
+- **Database**: Shared MySQL on AWS RDS (consumed by both Node and Java backends)
 - **Auth**: Stateless JWT with signature validation
 - **Features**: 7 microservices + 1 Lambda event processor
 
@@ -97,7 +97,7 @@ vegan-mundi-microservices-java/
 
 - [SETUP.md](SETUP.md) - Local development environment setup
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - Detailed architecture and design
-- [docs/TERRAFORM_GUIDE.md](docs/TERRAFORM_GUIDE.md) - Provisioning infrastructure
+- [terraform/README.md](terraform/README.md) - Provisioning and targeted apply guide
 - [docs/SERVICE_CONTRACTS.md](docs/SERVICE_CONTRACTS.md) - API contracts between services
 - [docs/AWS_CLI_EXAMPLES.md](docs/AWS_CLI_EXAMPLES.md) - Operational AWS CLI commands
 - [docs/INTERVIEW_TALKING_POINTS.md](docs/INTERVIEW_TALKING_POINTS.md) - Key narratives for interviews
@@ -141,10 +141,10 @@ Trigger: Commit to `main` or `dev` branch
 
 | Component | Monthly Cost (Dev) |
 |-----------|---|
-| EC2 (2× t3.small) | ~$20 (scales to $0 when stopped) |
+| EC2 (2× t3.micro) | ~$20 (scales to $0 when stopped) |
 | ALB | ~$16 |
 | NAT Gateway | ~$32 |
-| S3 + DynamoDB (state) | ~$1 |
+| S3 (state) | ~$1 |
 | Lambda | ~$0 (free tier) |
 | **Total** | **~$70/month** (or ~$50 when EC2 stopped) |
 

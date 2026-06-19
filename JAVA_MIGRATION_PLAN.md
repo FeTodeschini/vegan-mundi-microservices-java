@@ -9,8 +9,7 @@ Migrate Vegan Mundi from Node.js to Java microservices on AWS ECS (EC2), with AL
 
 ### Data & Auth
 - **Primary DB**: MySQL on RDS
-- **Auth**: Stateless JWT with signature validation only (no DynamoDB token storage)
-- **No DynamoDB**: Not needed for core workload; added complexity without benefit for this scope
+- **Auth**: Stateless JWT with signature validation only
 - **Event Bus**: EventBridge for domain events (optional; start without if scope is tight)
 
 ### Compute
@@ -28,7 +27,7 @@ Migrate Vegan Mundi from Node.js to Java microservices on AWS ECS (EC2), with AL
 ### Lambda Feature
 - **Trigger**: OrderCreated event (via EventBridge or simple SNS)
 - **Function**: Send order confirmation email + write lightweight analytics record
-- **Stack**: Java Spring Boot service publishes event → Lambda consumes → SES email + DynamoDB analytics
+- **Stack**: Java Spring Boot service publishes event → Lambda consumes → SES email
 - **Interview Value**: Demonstrates hybrid container + serverless, event-driven patterns
 
 ### AWS CLI Opportunities
@@ -70,7 +69,7 @@ vegan-mundi-microservices-java/
 ├── SETUP.md                           # Local dev setup, requirements, troubleshooting
 │
 ├── terraform/                         # Infrastructure as Code
-│   ├── backend.tf                     # S3 remote state + DynamoDB locking
+│   ├── backend.tf                     # S3 remote state
 │   ├── variables.tf                   # Global variables (region, env, instance types)
 │   ├── outputs.tf                     # Outputs (ALB DNS, ECR repos, RDS endpoint)
 │   │
@@ -83,7 +82,7 @@ vegan-mundi-microservices-java/
 │   │   ├── iam/                       # IAM roles, task execution role, Jenkins role
 │   │   ├── cloudwatch/                # Log groups, alarms, dashboards
 │   │   ├── eventbridge/               # EventBridge rule, SNS topic for events
-│   │   └── lambda/                    # Lambda function, IAM role, DynamoDB analytics table
+│   │   └── lambda/                    # Lambda function and IAM role
 │   │
 │   ├── dev/                           # Dev environment
 │   │   ├── main.tf                    # Module instantiation for dev
@@ -213,7 +212,7 @@ Each module should be independently reusable and well-documented:
 
 ### ECS Module
 - ECS cluster with EC2 launch type
-- Auto Scaling Group (t3.medium or t3.small instances)
+- Auto Scaling Group (t3.micro instances by default; scale up later if needed)
 - Capacity provider linking ASG to ECS
 - Outputs: cluster name, capacity provider name
 
@@ -229,8 +228,7 @@ Each module should be independently reusable and well-documented:
 
 ### Lambda Module
 - Lambda function for order confirmation
-- DynamoDB analytics table (optional)
-- IAM role (SES send, DynamoDB write, CloudWatch logs)
+- IAM role (SES send, CloudWatch logs)
 - EventBridge rule routing OrderCreated → Lambda
 - Dead-letter queue for failed invocations
 
@@ -247,7 +245,7 @@ Each module should be independently reusable and well-documented:
 - [ ] Scaffold Maven project structure (parent + modules)
 - [ ] Set up shared-library with JWT validation, common exceptions, DTOs
 - [ ] AWS account + IAM user with Terraform permissions
-- [ ] Initialize Terraform backend (S3 + DynamoDB lock)
+- [ ] Initialize Terraform backend (S3)
 - [ ] Create `.github/copilot/` directory with custom instruction files (Phase 7, can defer)
 
 **Deliverable**: Buildable empty services, Terraform backend ready, team can clone and run locally.
@@ -305,7 +303,6 @@ Each module should be independently reusable and well-documented:
 - [ ] Order-service publishes OrderCreated event to EventBridge
 - [ ] Implement order-confirmation Lambda (Java + Spring Cloud Function)
 - [ ] Lambda sends confirmation email via SES
-- [ ] Lambda writes lightweight analytics to DynamoDB (optional)
 - [ ] EventBridge rule with retry policy and DLQ
 - [ ] Manual test: `aws events put-events` to trigger Lambda
 - [ ] CloudWatch alarms for Lambda errors
@@ -371,7 +368,7 @@ Custom GitHub Copilot instruction files in `.github/copilot/` provide templated 
 
 ### Cost Control via EC2 Lifecycle
 Since the project uses EC2 instances, cost optimization is critical:
-- Running 2× t3.small 24/7: ~$20/month
+- Running 2× t3.micro 24/7: ~$20/month
 - Scale to 0 when not demoing: save ~$18/month
 - **Interview talking point**: "I automated infrastructure cost control with AI-assisted DevOps prompts"
 
@@ -677,7 +674,7 @@ aws ecs run-task --cluster dev-ecs-cluster --task-definition migration-task --la
 
 | Component | Dev Cost | Production Note |
 |---|---|---|
-| EC2 (2× t3.small) | ~$20/month | Use t3.medium for prod; reserved instances save 40% |
+| EC2 (2× t3.micro) | ~$20/month | Scale up instance size only when workload proves it is needed; reserved instances save 40% |
 | RDS MySQL (when added) | $30/month (single AZ) | Multi-AZ ~$60/month |
 | ALB | ~$16/month | Always needed; cost per GB processed |
 | NAT Gateway | ~$32/month | Only if private subnets access internet |
@@ -693,7 +690,6 @@ aws ecs run-task --cluster dev-ecs-cluster --task-definition migration-task --la
 |---|---|---|
 | Database | MySQL EC2, not RDS | Cost; can migrate to RDS with Terraform change |
 | Auth | Stateless JWT | Scalable; no token revocation needed for MVP |
-| DynamoDB | Skip (for now) | Stateless JWT + RDS covers all needs; adds complexity |
 | Orchestration | ECS EC2 | Shows operational understanding; cost-efficient |
 | IaC | Terraform | Industry standard; works with Jenkins; repeatable |
 | CI/CD | Jenkins | Integrates with Terraform; good for learning DevOps |
