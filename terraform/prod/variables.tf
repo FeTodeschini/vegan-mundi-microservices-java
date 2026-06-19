@@ -86,6 +86,11 @@ variable "db_publicly_accessible" {
   type        = bool
   description = "Whether RDS is publicly accessible"
   default     = false
+
+  validation {
+    condition     = var.db_publicly_accessible == false
+    error_message = "Production RDS must remain private. Set db_publicly_accessible=false."
+  }
 }
 
 variable "db_allowed_cidr_blocks" {
