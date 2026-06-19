@@ -28,7 +28,7 @@ variable "availability_zones" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type for ECS"
-  default     = "t3.small"
+  default     = "t3.micro"
 }
 
 variable "desired_capacity" {

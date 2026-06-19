@@ -13,14 +13,13 @@ terraform {
   # terraform init -backend-config="bucket=YOUR_BUCKET" \
   #                -backend-config="key=vegan-mundi/terraform.tfstate" \
   #                -backend-config="region=us-east-2" \
-  #                -backend-config="dynamodb_table=vegan-mundi-tf-lock"
+  #                -backend-config="encrypt=true"
   
   backend "s3" {
     # These values must be provided via backend-config or terraform init
     # bucket         = "vegan-mundi-tf-state"
     # key            = "vegan-mundi/terraform.tfstate"
     # region         = "us-east-2"
-    # dynamodb_table = "vegan-mundi-tf-lock"
     # encrypt        = true
   }
 }

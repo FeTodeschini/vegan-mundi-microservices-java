@@ -23,7 +23,7 @@ variable "public_subnet_id" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type for Jenkins host"
-  default     = "t3.small"
+  default     = "t3.micro"
 }
 
 variable "key_name" {
@@ -80,7 +80,6 @@ variable "attach_policy_arns" {
   default = [
     "arn:aws:iam::aws:policy/PowerUserAccess",
     "arn:aws:iam::aws:policy/IAMFullAccess",
-    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
-    "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   ]
 }

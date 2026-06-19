@@ -8,10 +8,10 @@ availability_zones  = ["us-east-2a", "us-east-2b"]
 enable_nat          = true
 
 # Compute
-instance_type    = "t3.small"
+instance_type    = "t3.micro"
 desired_capacity = 2
 min_capacity     = 1
-max_capacity     = 4
+max_capacity     = 3
 
 # Database
 db_username = "admin"
