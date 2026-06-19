@@ -74,6 +74,30 @@ variable "repo_branch" {
   default     = "main"
 }
 
+variable "jenkins_admin_id" {
+  type        = string
+  description = "Jenkins admin username used by JCasC"
+  default     = "admin"
+}
+
+variable "jenkins_admin_password" {
+  type        = string
+  description = "Jenkins admin password used by JCasC"
+  sensitive   = true
+}
+
+variable "jenkins_pipeline_name" {
+  type        = string
+  description = "Pipeline job name auto-created by JCasC"
+  default     = "vegan-mundi-deploy"
+}
+
+variable "jenkinsfile_path" {
+  type        = string
+  description = "Repository path to Jenkinsfile for auto-created pipeline"
+  default     = "jenkins/Jenkinsfile"
+}
+
 variable "attach_policy_arns" {
   type        = list(string)
   description = "IAM policies attached to Jenkins EC2 role"

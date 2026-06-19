@@ -21,6 +21,11 @@ allowed_jenkins_cidrs = ["76.98.179.193/32"]
 repo_url    = ""
 repo_branch = "main"
 
+jenkins_admin_id       = "admin"
+jenkins_admin_password = "CHANGE_ME_STRONG_PASSWORD"
+jenkins_pipeline_name  = "vegan-mundi-deploy"
+jenkinsfile_path       = "jenkins/Jenkinsfile"
+
 # Tighten permissions later as you harden the stack.
 attach_policy_arns = [
   "arn:aws:iam::aws:policy/PowerUserAccess",

@@ -2,7 +2,19 @@
 set -euxo pipefail
 
 dnf update -y
-dnf install -y docker git docker-compose-plugin
+dnf install -y docker git
+
+# Some AL2023 mirrors do not publish docker-compose-plugin as a separate package.
+# Docker package already includes the Compose v2 subcommand on current AL2023 images.
+if ! docker compose version >/dev/null 2>&1; then
+	dnf install -y docker-compose-plugin || true
+fi
+
+if ! docker compose version >/dev/null 2>&1; then
+	mkdir -p /usr/local/libexec/docker/cli-plugins
+	curl -fsSL "https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64" -o /usr/local/libexec/docker/cli-plugins/docker-compose
+	chmod +x /usr/local/libexec/docker/cli-plugins/docker-compose
+fi
 
 systemctl enable --now docker
 usermod -aG docker ec2-user
@@ -14,5 +26,16 @@ echo "Bootstrap complete. Install repo and start Jenkins compose manually if nee
 
 %{ if repo_url != "" ~}
 su - ec2-user -c 'if [ ! -d /opt/jenkins/vegan-mundi-java ]; then git clone --branch ${repo_branch} ${repo_url} /opt/jenkins/vegan-mundi-java; fi'
-su - ec2-user -c 'cd /opt/jenkins/vegan-mundi-java/jenkins && docker compose up -d --build'
+cat >/opt/jenkins/vegan-mundi-java/jenkins/.env <<'EOF'
+JENKINS_ADMIN_ID=${jenkins_admin_id}
+JENKINS_ADMIN_PASSWORD=${jenkins_admin_password}
+JENKINS_PIPELINE_NAME=${jenkins_pipeline_name}
+JENKINS_REPO_URL=${repo_url}
+JENKINS_REPO_BRANCH=${repo_branch}
+JENKINS_JENKINSFILE_PATH=${jenkinsfile_path}
+EOF
+chown ec2-user:ec2-user /opt/jenkins/vegan-mundi-java/jenkins/.env
+
+cd /opt/jenkins/vegan-mundi-java/jenkins
+docker compose up -d --build
 %{ endif ~}

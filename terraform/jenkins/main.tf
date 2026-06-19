@@ -85,9 +85,13 @@ resource "aws_instance" "jenkins" {
   }
 
   user_data = templatefile("${path.module}/user_data.sh.tftpl", {
-    jenkins_port = var.jenkins_port
-    repo_url     = var.repo_url
-    repo_branch  = var.repo_branch
+    jenkins_port           = var.jenkins_port
+    repo_url               = var.repo_url
+    repo_branch            = var.repo_branch
+    jenkins_admin_id       = var.jenkins_admin_id
+    jenkins_admin_password = var.jenkins_admin_password
+    jenkins_pipeline_name  = var.jenkins_pipeline_name
+    jenkinsfile_path       = var.jenkinsfile_path
   })
 
   tags = {

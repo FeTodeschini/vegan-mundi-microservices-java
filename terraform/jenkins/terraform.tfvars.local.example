@@ -18,6 +18,11 @@ allowed_jenkins_cidrs = ["x.x.x.x/32"]
 repo_url    = ""
 repo_branch = "main"
 
+jenkins_admin_id       = "admin"
+jenkins_admin_password = "CHANGE_ME_STRONG_PASSWORD"
+jenkins_pipeline_name  = "vegan-mundi-deploy"
+jenkinsfile_path       = "jenkins/Jenkinsfile"
+
 attach_policy_arns = [
   "arn:aws:iam::aws:policy/PowerUserAccess",
   "arn:aws:iam::aws:policy/IAMFullAccess",

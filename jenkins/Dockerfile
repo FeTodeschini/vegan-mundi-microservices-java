@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Java (required for Maven builds)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openjdk-17-jdk-headless \
+    default-jdk-headless \
     && apt-get clean
 
 # Install Maven
@@ -26,7 +26,7 @@ RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apac
     | tar xzf - -C /opt && \
     ln -s /opt/apache-maven-3.9.1 /opt/maven
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/default-java
 ENV M2_HOME=/opt/maven
 ENV PATH=$PATH:$M2_HOME/bin
 
