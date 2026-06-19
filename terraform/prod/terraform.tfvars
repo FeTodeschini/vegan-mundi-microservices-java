@@ -9,9 +9,9 @@ enable_nat         = true
 
 # Compute
 instance_type     = "t3.micro"
-desired_capacity  = 3
+desired_capacity  = 2
 min_capacity      = 2
-max_capacity      = 4
+max_capacity      = 3
 
 # Database
 db_username = "admin"
