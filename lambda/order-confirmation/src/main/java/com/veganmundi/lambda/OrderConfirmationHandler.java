@@ -19,7 +19,6 @@ public class OrderConfirmationHandler implements RequestHandler<SQSEvent, String
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final SesClient sesClient = SesClient.builder().build();
     private static final String SENDER_EMAIL = System.getenv("SENDER_EMAIL");
-    private static final String ANALYTICS_TABLE = System.getenv("ANALYTICS_TABLE");
 
     @Override
     public String handleRequest(SQSEvent event, Context context) {
@@ -70,8 +69,7 @@ public class OrderConfirmationHandler implements RequestHandler<SQSEvent, String
     }
 
     private void recordAnalytics(String orderId, String userId, LambdaLogger logger) {
-        // TODO: Write to DynamoDB analytics table (optional)
-        logger.log("Recording analytics for order: " + orderId);
+        logger.log("Skipping analytics persistence for order: " + orderId + " (not configured)");
     }
 
     private String buildEmailHtml(String orderId, String amount) {
