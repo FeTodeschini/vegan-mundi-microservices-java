@@ -9,19 +9,19 @@ variable "environment" {
   description = "Environment name (dev, test, prod)"
 }
 
-variable "vpc_id" {
+variable "vpc_cidr" {
   type        = string
-  description = "Existing VPC ID for prod deployment"
+  description = "CIDR block for VPC"
 }
 
-variable "public_subnet_ids" {
+variable "availability_zones" {
   type        = list(string)
-  description = "Existing public subnet IDs used by ALB"
+  description = "Availability zones for the region"
 }
 
-variable "private_subnet_ids" {
-  type        = list(string)
-  description = "Existing private subnet IDs used by ECS/RDS"
+variable "enable_nat" {
+  type        = bool
+  description = "Enable NAT Gateway for private subnet internet access"
 }
 
 variable "instance_type" {
@@ -86,6 +86,12 @@ variable "db_publicly_accessible" {
   type        = bool
   description = "Whether RDS is publicly accessible"
   default     = false
+}
+
+variable "db_allowed_cidr_blocks" {
+  type        = list(string)
+  description = "CIDR blocks allowed to connect to RDS from outside VPC"
+  default     = []
 }
 
 variable "db_skip_final_snapshot" {

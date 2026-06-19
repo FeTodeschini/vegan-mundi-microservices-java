@@ -8,7 +8,12 @@ terraform {
     }
   }
 
-  backend "s3" {}
+  backend "s3" {
+    bucket  = "vegan-mundi-tf-state-211125337663-us-east-2"
+    key     = "vegan-mundi/prod/terraform.tfstate"
+    region  = "us-east-2"
+    encrypt = true
+  }
 }
 
 provider "aws" {
