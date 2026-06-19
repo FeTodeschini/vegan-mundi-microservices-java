@@ -45,22 +45,6 @@ aws s3api put-bucket-versioning \
     --versioning-configuration Status=Enabled \
     --region "$AWS_REGION"
 
-# Create DynamoDB table for Terraform locking
-LOCK_TABLE="vegan-mundi-tf-lock-${ENVIRONMENT}"
-echo -e "${YELLOW}Creating DynamoDB lock table...${NC}"
-
-if aws dynamodb describe-table --table-name "$LOCK_TABLE" --region "$AWS_REGION" 2>/dev/null; then
-    echo -e "${GREEN}✓${NC} Table already exists: $LOCK_TABLE"
-else
-    aws dynamodb create-table \
-        --table-name "$LOCK_TABLE" \
-        --attribute-definitions AttributeName=LockID,AttributeType=S \
-        --key-schema AttributeName=LockID,KeyType=HASH \
-        --billing-mode PAY_PER_REQUEST \
-        --region "$AWS_REGION"
-    echo -e "${GREEN}✓${NC} Created DynamoDB table: $LOCK_TABLE"
-fi
-
 # Create ECR repositories
 echo -e "${YELLOW}Creating ECR repositories...${NC}"
 
@@ -101,7 +85,6 @@ terraform {
     bucket         = "${STATE_BUCKET}"
     key            = "vegan-mundi/${ENVIRONMENT}/terraform.tfstate"
     region         = "${AWS_REGION}"
-    dynamodb_table = "${LOCK_TABLE}"
     encrypt        = true
   }
 }
