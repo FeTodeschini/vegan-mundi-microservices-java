@@ -79,7 +79,7 @@ infracost breakdown --path terraform/dev --format json
 - ⚠️ RDS backup retention: 7 days (recommend 30+ for production)
 
 #### 💰 Cost Impact
-- EC2 ASG: +$0.047/day (1 additional t3.small)
+- EC2 ASG: additional daily cost depends on current micro instance pricing in the selected region
 - RDS storage: +$5/month (50GB → 100GB)
 - CloudWatch logs: ~$0 (free tier)
 - **Total Monthly Increase**: ~$6.50

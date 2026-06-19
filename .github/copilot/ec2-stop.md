@@ -51,19 +51,19 @@ aws autoscaling describe-auto-scaling-groups \
 ## Cost Savings Calculation
 
 ```
-Dev Environment (2× t3.small per hour):
+Dev Environment (2× t3.micro per hour):
 - Running: 2 × $0.0235/hour = $0.047/hour = $1.13/day = $34/month
 - Stopped: $0
 - Daily savings: $1.13
 - Monthly savings: $34
 
-Test Environment (2× t3.small per hour):
+Test Environment (2× t3.micro per hour):
 - Running: 2 × $0.0235/hour = $0.047/hour = $1.13/day = $34/month
 - Stopped: $0
 - Daily savings: $1.13
 - Monthly savings: $34
 
-Production Environment (3× t3.small per hour):
+Production Environment (3× t3.micro per hour):
 - Running: 3 × $0.0235/hour = $0.071/hour = $1.70/day = $51/month
 - Stopped: $0
 - Daily savings: $1.70

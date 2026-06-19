@@ -13,6 +13,7 @@ Custom GitHub Copilot instruction files for automating DevOps tasks and cost opt
 | **Terraform Reviewer** | `@copilot-terraform-plan-reviewer` | Review infrastructure changes safely |
 | **DNS Switch to AWS** | `@copilot-dns-switch-to-aws` | Point `api` CNAME to AWS ALB for demo mode |
 | **DNS Switch to Render** | `@copilot-dns-switch-to-render` | Point `api` CNAME back to Render for normal mode |
+| **Backend Switch** | `@copilot-backend-switch` | Ask AWS or Render and produce full human runbook with rollback |
 
 ## Prerequisites
 
@@ -30,7 +31,7 @@ User: @copilot-ec2-start
 Copilot: Which environment? (dev/test/prod)
 > dev
 
-Copilot: Starting 2 t3.small instances in dev cluster...
+Copilot: Starting 2 t3.micro instances in dev cluster...
 [provides exact AWS CLI command]
 [monitors startup status]
 [confirms readiness]
@@ -98,7 +99,7 @@ Approve changes? (yes/no)
 ## Cost Savings Example
 
 **Dev Environment Costs**
-- Running 24/7: ~$20/month (2× t3.small)
+- Running 24/7: ~$20/month (2× t3.micro)
 - With EC2 start/stop: ~$2-3/month
 
 **Usage Pattern**

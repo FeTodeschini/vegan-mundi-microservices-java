@@ -46,7 +46,7 @@ Provide structured response:
 📊 **Current Capacity**: [X instances]
 ⬆️ **Desired Capacity**: [Y instances]
 ⏱️ **Estimated Time**: 2-3 minutes for startup
-💰 **Cost**: ~$0.67/day per t3.small instance
+💰 **Cost**: micro-sized instance cost; verify current AWS regional pricing before use
 
 **Next Step**: Run `@copilot-ec2-health-check` to verify all services are healthy
 
