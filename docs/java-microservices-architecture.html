@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegan Mundi Java Architecture Guide</title>
+  <style>
+    :root {
+      --bg: #f6f2e9;
+      --paper: #fffdf8;
+      --ink: #1d2a28;
+      --muted: #5f6c67;
+      --line: #d7cec0;
+      --accent: #0f766e;
+      --accent-soft: #d6f0ea;
+      --warm: #c56a2d;
+      --warm-soft: #f5e0d0;
+      --shadow: 0 16px 40px rgba(29, 42, 40, 0.08);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(197, 106, 45, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.14), transparent 24%),
+        linear-gradient(180deg, #f7f0e2 0%, var(--bg) 100%);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .shell {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 32px 20px 72px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 253, 248, 0.96), rgba(255, 248, 238, 0.98));
+      border: 1px solid rgba(215, 206, 192, 0.9);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -80px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(15, 118, 110, 0.12), transparent 70%);
+    }
+
+    .hero-inner {
+      padding: 40px;
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1.5fr 1fr;
+      align-items: start;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-top: 14px;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 60ch;
+    }
+
+    .hero-card,
+    .section,
+    .tile,
+    .service-card,
+    .pipeline-step,
+    .tf-card,
+    .note {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 22px;
+      background: linear-gradient(180deg, #fffdf8, #fcf7ed);
+    }
+
+    .hero-card ul,
+    .section ul,
+    .service-card ul,
+    .tf-card ul,
+    .note ul {
+      margin: 12px 0 0;
+      padding-left: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section {
+      padding: 28px;
+      margin-top: 24px;
+    }
+
+    .kicker {
+      color: var(--warm);
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .tile {
+      padding: 20px;
+    }
+
+    .arch-flow {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .lane {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .box {
+      min-height: 100px;
+      padding: 18px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffdf8, #faf4e7);
+    }
+
+    .box strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .box small {
+      color: var(--muted);
+      display: block;
+    }
+
+    .arrow-row {
+      text-align: center;
+      color: var(--warm);
+      letter-spacing: 0.2em;
+      font-size: 1.2rem;
+    }
+
+    .services {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 18px;
+    }
+
+    .service-card {
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--accent), var(--warm));
+    }
+
+    .service-meta {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .pipeline {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .pipeline-step {
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 72px 1fr;
+      align-items: start;
+    }
+
+    .step-no {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--warm-soft);
+      color: var(--warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .tf-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 18px;
+    }
+
+    .tf-card {
+      padding: 20px;
+      background: linear-gradient(180deg, #fffdf8, #f8fbfa);
+    }
+
+    .callout-row {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 18px;
+    }
+
+    .note {
+      padding: 20px;
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.92em;
+      background: #f2ece2;
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner,
+      .grid-3,
+      .grid-2,
+      .lane,
+      .services,
+      .tf-grid,
+      .callout-row {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        grid-template-columns: 1fr;
+      }
+
+      .step-no {
+        margin-bottom: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <span class="eyebrow">Architecture Guide</span>
+          <h1>Vegan Mundi Java Microservices on AWS</h1>
+          <p class="lead">
+            This document explains the current Java migration architecture in plain language: what each service does,
+            how traffic flows through AWS, how Jenkins delivers changes, and how Terraform organizes the infrastructure.
+          </p>
+        </div>
+        <aside class="hero-card">
+          <h3>At a glance</h3>
+          <ul>
+            <li>7 Spring Boot services plus 1 shared library and 1 Lambda module</li>
+            <li>AWS ECS on EC2 behind an Application Load Balancer</li>
+            <li>Terraform modules for network, compute, registry, logging, events, and IAM</li>
+            <li>Jenkins pipeline for build, image publish, infrastructure rollout, and smoke tests</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">System shape</div>
+      <h2>How the platform is put together</h2>
+      <p>
+        The architecture uses a classic edge-to-core layout. Client traffic reaches an Application Load Balancer,
+        which routes requests to Java services running as containers on ECS. Services use a shared library for common
+        concerns such as JWT handling, and the order path also publishes an asynchronous event for a Lambda-based
+        follow-up workflow.
+      </p>
+
+      <div class="arch-flow">
+        <div class="lane">
+          <div class="box">
+            <strong>Clients</strong>
+            Web browsers, mobile clients, or API callers.
+          </div>
+          <div class="box">
+            <strong>DNS</strong>
+            External DNS points traffic to the ALB endpoint.
+          </div>
+          <div class="box">
+            <strong>ALB</strong>
+            Path-based routing sends traffic to the right service.
+          </div>
+          <div class="box">
+            <strong>ECS Services</strong>
+            Spring Boot containers handle the request.
+          </div>
+        </div>
+        <div class="arrow-row">DOWNSTREAM FLOW</div>
+        <div class="lane">
+          <div class="box">
+            <strong>MySQL</strong>
+            Primary relational data store for service-owned tables.
+          </div>
+          <div class="box">
+            <strong>EventBridge</strong>
+            Receives order domain events for async processing.
+          </div>
+          <div class="box">
+            <strong>Lambda</strong>
+            Handles order confirmation and optional analytics work.
+          </div>
+          <div class="box">
+            <strong>CloudWatch</strong>
+            Captures logs, metrics, alarms, and service visibility.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">Component map</div>
+      <h2>Microservices and supporting components</h2>
+      <div class="services">
+        <article class="service-card">
+          <h3>account-service</h3>
+          <p>Owns registration, login, profile lookup, and JWT-oriented authentication concerns.</p>
+          <div class="service-meta">Expected routes include <code>/api/account/register</code>, <code>/login</code>, <code>/profile</code>, and <code>/health</code>.</div>
+        </article>
+        <article class="service-card">
+          <h3>class-service</h3>
+          <p>Provides class catalog search, filters, lookups, and category-driven browsing.</p>
+          <div class="service-meta">Supports the product discovery side of the platform.</div>
+        </article>
+        <article class="service-card">
+          <h3>order-service</h3>
+          <p>Coordinates checkout, order creation, and order status updates.</p>
+          <div class="service-meta">This is the most integration-heavy service because it touches pricing, delivery, and async events.</div>
+        </article>
+        <article class="service-card">
+          <h3>review-service</h3>
+          <p>Manages user reviews, star ratings, and feedback attached to classes.</p>
+          <div class="service-meta">Read-heavy and largely independent from order processing.</div>
+        </article>
+        <article class="service-card">
+          <h3>delivery-service</h3>
+          <p>Models delivery methods, shipment details, and shipping-related calculations.</p>
+          <div class="service-meta">Used by the order path to calculate or validate fulfillment options.</div>
+        </article>
+        <article class="service-card">
+          <h3>gallery-service</h3>
+          <p>Handles media metadata and S3-oriented image or video workflows.</p>
+          <div class="service-meta">Useful for media hosting and asset management without bloating other services.</div>
+        </article>
+        <article class="service-card">
+          <h3>price-service</h3>
+          <p>Owns pricing rules, discounts, and cost estimation logic.</p>
+          <div class="service-meta">Designed to keep pricing logic isolated from order orchestration.</div>
+        </article>
+        <article class="service-card">
+          <h3>shared-library and Lambda</h3>
+          <p>The shared library centralizes common code. The order-confirmation Lambda handles async side effects after an order event.</p>
+          <div class="service-meta">This split keeps synchronous requests lean while still supporting event-driven behavior.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">Request paths</div>
+      <h2>How data moves through the system</h2>
+      <div class="grid grid-2" style="margin-top: 18px;">
+        <div class="tile">
+          <h3>Synchronous request flow</h3>
+          <ul>
+            <li>A user request reaches the ALB.</li>
+            <li>The ALB chooses the target service using the URL path.</li>
+            <li>The service executes business logic and reads or writes MySQL.</li>
+            <li>If the workflow needs another service, ECS-based service discovery is the intended internal path.</li>
+            <li>The service returns a normal HTTP response to the client.</li>
+          </ul>
+        </div>
+        <div class="tile">
+          <h3>Asynchronous order flow</h3>
+          <ul>
+            <li>order-service completes the core checkout transaction.</li>
+            <li>It publishes an order event to EventBridge.</li>
+            <li>The order-confirmation Lambda reacts after the client response is already done.</li>
+            <li>The Lambda can send confirmation email with SES and record lightweight analytics data.</li>
+            <li>This keeps customer-facing latency separate from follow-up processing.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">Delivery automation</div>
+      <h2>What the Jenkins pipeline is responsible for</h2>
+      <p>
+        The repo includes a declarative Jenkins pipeline plus a dedicated Jenkins runtime folder. The design assumes Jenkins
+        can build the whole Maven project, publish Docker images to ECR, optionally run Terraform, and then trigger ECS deployments.
+      </p>
+
+      <div class="pipeline">
+        <article class="pipeline-step">
+          <div class="step-no">1</div>
+          <div>
+            <h3>Validate and checkout</h3>
+            <p>The pipeline validates required parameters such as AWS account ID and Terraform state bucket, then checks out the repo.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">2</div>
+          <div>
+            <h3>Build and test</h3>
+            <p>Maven builds all modules. Tests can be skipped with a parameter, but the intended default path runs them.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">3</div>
+          <div>
+            <h3>Build and push container images</h3>
+            <p>Each service image is built and pushed to Amazon ECR with a build-number tag plus <code>latest</code>.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">4</div>
+          <div>
+            <h3>Plan infrastructure changes</h3>
+            <p>If enabled, Jenkins runs <code>terraform init</code> and <code>terraform plan</code> inside the chosen environment folder and writes a readable plan artifact.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">5</div>
+          <div>
+            <h3>Approval gate and apply</h3>
+            <p>A manual approval step protects the apply stage. If approved and not in dry-run mode, Terraform applies the saved plan.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">6</div>
+          <div>
+            <h3>Deploy ECS services</h3>
+            <p>The pipeline reads current task definitions, swaps container image references, registers new task definitions, and forces new ECS deployments.</p>
+          </div>
+        </article>
+        <article class="pipeline-step">
+          <div class="step-no">7</div>
+          <div>
+            <h3>Smoke test and rollback</h3>
+            <p>Health endpoints are checked through the ALB. On failure, the pipeline hands off to a rollback script.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">Infrastructure as code</div>
+      <h2>How Terraform is organized</h2>
+      <p>
+        Terraform is laid out in the standard reusable-module style. The root defines shared provider and backend behavior,
+        while environment folders choose concrete values and instantiate the module set.
+      </p>
+
+      <div class="tf-grid">
+        <article class="tf-card">
+          <h3>Root layer</h3>
+          <ul>
+            <li><code>backend.tf</code> configures remote state in S3.</li>
+            <li><code>variables.tf</code> defines region, capacity, database, network, and certificate controls.</li>
+            <li><code>outputs.tf</code> is intended to publish ALB, ECS, registry, database, and event outputs.</li>
+          </ul>
+        </article>
+        <article class="tf-card">
+          <h3>Environment layer</h3>
+          <ul>
+            <li><code>terraform/dev</code> holds one environment instance and also contains evidence of a past apply.</li>
+            <li><code>terraform/test</code> and <code>terraform/prod</code> mirror the same pattern for higher environments.</li>
+            <li><code>terraform/jenkins</code> manages a dedicated Jenkins host stack.</li>
+          </ul>
+        </article>
+        <article class="tf-card">
+          <h3>Module layer</h3>
+          <ul>
+            <li><code>vpc</code> for network and subnet layout.</li>
+            <li><code>alb</code> for public ingress and target groups.</li>
+            <li><code>ecs</code> for cluster, launch template, ASG, and capacity provider.</li>
+            <li><code>ecr</code>, <code>iam</code>, <code>rds</code>, <code>cloudwatch</code>, <code>eventbridge</code>, and <code>lambda</code> for the rest of the platform.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="kicker">Operational reading</div>
+      <h2>What this architecture says about the project</h2>
+      <div class="callout-row">
+        <article class="note">
+          <h3>Strengths</h3>
+          <ul>
+            <li>Clear separation of service concerns.</li>
+            <li>Infrastructure and delivery are described in code, not in tribal knowledge.</li>
+            <li>The design demonstrates both container-based and event-driven patterns.</li>
+            <li>The repo is structured so a single service can be proved first and the rest can follow.</li>
+          </ul>
+        </article>
+        <article class="note">
+          <h3>Current reality</h3>
+          <ul>
+            <li>This is a strong foundation, not a finished production platform.</li>
+            <li>Several service endpoints are still stubs and need real persistence and security logic.</li>
+            <li>Terraform and Jenkins both need environment validation to prove that the coded design matches live behavior.</li>
+            <li>Some Markdown docs referenced elsewhere in the repo are still missing and should be filled in as Phase 1 proceeds.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <p class="footer">
+      Generated from the current repository structure on 2026-06-19. Pair this page with the Markdown sources in docs/ and jenkins/ when you need implementation-level detail.
+    </p>
+  </div>
+</body>
+</html>

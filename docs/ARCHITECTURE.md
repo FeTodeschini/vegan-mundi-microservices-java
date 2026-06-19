@@ -4,6 +4,8 @@
 
 Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java on AWS ECS EC2. The system consists of 7 independent microservices communicating through RESTful APIs, with event-driven async processing via Lambda.
 
+This document describes the target architecture and the repository structure that currently supports it. Where the implementation is still scaffold-level, that is called out explicitly so the document remains accurate to the codebase.
+
 ## Architecture Diagram
 
 ```
@@ -54,7 +56,7 @@ Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌──────────────────────┐           ┌─────────────────────┐     │
-│  │  MySQL (EC2)         │           │  EventBridge        │     │
+│  │  MySQL (AWS RDS)     │           │  EventBridge        │     │
 │  │  - Accounts          │           │  - OrderCreated     │     │
 │  │  - Classes           │           │  - Events routing   │     │
 │  │  - Orders            │           │                     │     │
@@ -68,6 +70,10 @@ Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java
 └──────────────────────────────────────────────────────────────────┘
 ```
 
+Current repo note:
+- The service decomposition, Terraform layout, and Jenkins pipeline are present in the repository.
+- Several business endpoints are still stubbed, so this diagram should be read as the intended steady-state architecture rather than a claim that every service path is fully implemented today.
+
 ## Technology Stack
 
 ### Application Tier
@@ -80,15 +86,15 @@ Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java
 ### Orchestration & Infrastructure
 - **Container Orchestration**: AWS ECS (EC2 launch type)
 - **Load Balancing**: Application Load Balancer (ALB)
-- **DNS**: External DNS provider (GoDaddy) points domain/subdomain to ALB DNS name
+- **DNS**: External DNS provider points domain or subdomain records to the ALB DNS name
 - **Container Registry**: ECR (Elastic Container Registry)
-- **Compute**: EC2 instances (t3.small/medium) in Auto Scaling Group
+- **Compute**: EC2 instances default to t3.micro in the current Terraform configuration
 - **Scaling Strategy**: ASG-based capacity, ECS service-level autoscaling
 
 ### Data & Events
-- **Primary Database**: MySQL 8.0 (on EC2, not RDS for cost control)
+- **Primary Database**: MySQL 8.0
 - **Schema Versioning**: Flyway migrations
-- **Async Events**: EventBridge + SNS
+- **Async Events**: EventBridge
 - **Lambda Processing**: Order confirmation async handler
 
 ### Observability
@@ -99,18 +105,27 @@ Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java
 
 ### Infrastructure as Code
 - **IaC Tool**: Terraform
-- **State Management**: S3 + DynamoDB (locking)
-- **Environment Separation**: dev/ and prod/ directories
+- **State Management**: S3 backend for remote state
+- **Environment Separation**: dev/, test/, prod/, and jenkins/ directories
 
 ### CI/CD
 - **Pipeline**: Jenkins with Jenkinsfile
 - **Container Build**: Docker build → ECR push
 - **Deployment**: ECS rolling updates
 - **Testing**: Maven unit/integration tests
+- **Runtime Assets**: Jenkins Docker image, docker-compose setup, JCasC baseline, and helper scripts live under `jenkins/`
+
+## Implementation Status Snapshot
+
+- **Implemented in repo today**: parent Maven build, seven service modules, shared library, Lambda module, Terraform module layout, environment folders, Jenkins pipeline assets, and baseline docs.
+- **Partially implemented**: concrete controllers are present for account-service, class-service, and order-service; non-health behavior is still largely stubbed.
+- **Planned by architecture**: full cross-service orchestration, hardened security, validated autoscaling behavior, and end-to-end production deployment workflows.
 
 ---
 
 ## Service Responsibilities
+
+These responsibilities describe the intended ownership boundaries for each service. They should be read as architecture targets, not proof that each workflow is already implemented.
 
 ### Account Service (Port 8001)
 - **Endpoints**: POST /api/account/register, POST /api/account/login, GET /api/account/profile
@@ -158,7 +173,7 @@ Vegan Mundi Java is a microservices-based platform migrated from Node.js to Java
 ### Lambda: Order Confirmation
 - **Trigger**: OrderCreated event from EventBridge
 - **Handler**: OrderConfirmationHandler.java
-- **Actions**: Send email (SES), write analytics (DynamoDB optional)
+- **Actions**: Send confirmation email via SES
 - **Timeout**: 30 seconds
 - **Memory**: 256 MB
 - **Concurrency**: Unreserved (auto-scale)
@@ -178,7 +193,6 @@ Client → ALB → Account Service → Class Service → MySQL → Response
 Order Service → EventBridge (OrderCreated event)
              → Lambda (order-confirmation)
              → SES (email)
-             → DynamoDB (analytics, optional)
 ```
 
 ### Service Mesh (ECS Service Connect)
@@ -203,7 +217,6 @@ Order Service → EventBridge (OrderCreated event)
 4. **EventBridge**: Routes to Lambda
 5. **Lambda** (async):
    - Sends confirmation email via SES
-   - Writes to DynamoDB for analytics (optional)
 6. **Response**: Order ID + status returned to client
 
 **Key Design**: Steps 1-4 are synchronous (fast, < 1 sec). Step 5 is asynchronous (fire-and-forget), so delays in email don't block user.
@@ -212,14 +225,16 @@ Order Service → EventBridge (OrderCreated event)
 
 ## Deployment Topology
 
+The values in this section are planning assumptions for environment sizing. They are useful for architecture discussion, but they are not a substitute for validating the actual Terraform outputs and deployed capacity in AWS.
+
 ### Dev Environment
-- **Cluster**: 1 ASG with 2 × t3.small EC2 instances
+- **Cluster**: 1 ASG with 2 × t3.micro EC2 instances by default
 - **Services**: All 7 deployed with 2 replicas each
-- **Database**: MySQL on EC2 (or managed RDS)
+- **Database**: Shared RDS MySQL (same DB can be consumed by Node and Java)
 - **Cost**: ~$70/month ($2/month if EC2 stopped when not in use)
 
 ### Production Environment
-- **Cluster**: 1 ASG with 3-6 × t3.medium EC2 instances
+- **Cluster**: 1 ASG with 3-6 × t3.micro EC2 instances in the current tfvars
 - **Services**: All 7 deployed with 2-4 replicas each (depends on load)
 - **Database**: RDS MySQL Multi-AZ (not on EC2)
 - **Scaling**: CPU-based autoscaling, request-count based service scaling
@@ -228,6 +243,8 @@ Order Service → EventBridge (OrderCreated event)
 ---
 
 ## Resilience & High Availability
+
+This section describes the intended operational posture once Phase 1 and later platform work is complete.
 
 ### Fault Tolerance
 - **Multi-AZ**: Services spread across 2 availability zones
@@ -238,7 +255,7 @@ Order Service → EventBridge (OrderCreated event)
 
 ### Scaling Strategy
 1. **Horizontal**: Add more EC2 instances (ASG scales)
-2. **Vertical**: Increase instance type (t3.small → t3.medium)
+2. **Vertical**: Increase instance type later only if t3.micro is no longer sufficient
 3. **Service-Level**: Increase replicas per service based on CPU/memory/requests
 
 ### Monitoring & Alerts
@@ -251,6 +268,8 @@ Order Service → EventBridge (OrderCreated event)
 ---
 
 ## Security Architecture
+
+Some of these controls are architectural targets rather than already-verified implementation details.
 
 ### Network Isolation
 - **Public subnets**: ALB only
