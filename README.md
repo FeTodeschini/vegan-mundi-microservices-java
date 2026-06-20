@@ -1,13 +1,17 @@
 # Vegan Mundi - Java Microservices on AWS ECS
 
-A complete migration of Vegan Mundi from Node.js to Java microservices, deployed on AWS ECS (EC2) with Terraform infrastructure-as-code, Jenkins CI/CD, and event-driven serverless components.
+The initial version of the Vegan Mundi Cooking Classes E-Commerce platform had back-end was NodeJs hosted on an EC2 instance manually provisioned for learning purposes (NGNIX and all dependencies were manually configured).
+
+In the second version, the same NodeJs back-end was migrated to Render for costs saving and simplicity. This is the NodeJs repo: [vegan-mundi](https://github.com/FeTodeschini/vegan-mundi).
+
+The current version found in this repo is a complete migration from Node.js to Java microservices deployed on AWS ECS backed by EC2 (no Fargate was used on purpose) with Terraform infrastructure-as-code, Jenkins CI/CD in Docker on dedicated EC2, and event-driven serverless components.
 
 ## Quick Overview
 
 - **Architecture**: Microservices (Spring Boot) on ECS EC2 behind ALB
 - **Infrastructure**: AWS (VPC, ALB, ECS, ECR, RDS/MySQL, Lambda, EventBridge)
 - **IaC**: Terraform with modular structure
-- **CI/CD**: Jenkins with automated testing and deployment
+- **CI/CD**: Jenkins with automated testing and deployment running in a Docker container in dedicated EC2
 - **Database**: Shared MySQL on AWS RDS (consumed by both Node and Java backends)
 - **Auth**: Stateless JWT with signature validation
 - **Features**: 7 microservices + 1 Lambda event processor
@@ -108,6 +112,12 @@ vegan-mundi-microservices-java/
 Custom Copilot agents for cost optimization and operational efficiency:
 
 ```bash
+# Start Jenkins EC2 (if stopped) and open an SSH tunnel for local DB Connection trough this EC2, as RDS is on a private subnet for security reasons and cannot be publicly acessed
+@ssh-tunnel
+
+# Guide humans on how to switch the back-end from NodeJs on Render to JAva on AWS ECS (and vice-versa)
+@backend-swicth
+
 # Start EC2 infrastructure for demo
 @copilot-ec2-start
 
