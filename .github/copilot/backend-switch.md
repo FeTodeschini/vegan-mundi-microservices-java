@@ -11,9 +11,9 @@ This prompt does not assume direct credentials execution. It provides exact step
 1. `TARGET_BACKEND` (`AWS` or `RENDER`)
 2. `DOMAIN` (default: `veganmundi.com`)
 3. `SUBDOMAIN` (default: `api`)
-4. `AWS_ALB_ARN` (required if TARGET_BACKEND=AWS)
+4. `AWS_ALB_ARN` (required if TARGET_BACKEND=AWS; default: `arn:aws:elasticloadbalancing:us-east-2:211125337663:loadbalancer/app/vegan-mundi-prod-alb/fccf5e01a9c89df5`)
 5. `AWS_REGION` (default: `us-east-2`)
-6. `RENDER_HOST` (example: `vegan-mundi.onrender.com`)
+6. `RENDER_HOST` (default: `vegan-mundi.onrender.com`)
 7. `TTL` (default: `600`)
 
 ## Core Rule

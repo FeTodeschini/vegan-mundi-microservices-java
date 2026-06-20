@@ -14,6 +14,7 @@ Custom GitHub Copilot instruction files for automating DevOps tasks and cost opt
 | **DNS Switch to AWS** | `@copilot-dns-switch-to-aws` | Point `api` CNAME to AWS ALB for demo mode |
 | **DNS Switch to Render** | `@copilot-dns-switch-to-render` | Point `api` CNAME back to Render for normal mode |
 | **Backend Switch** | `@copilot-backend-switch` | Ask AWS or Render and produce full human runbook with rollback |
+| **SSH Tunnel Jenkins** | `@copilot-ssh-tunnel-jenkis` | Start Jenkins EC2 if needed, then open local RDS tunnel via bastion |
 
 ## Prerequisites
 
