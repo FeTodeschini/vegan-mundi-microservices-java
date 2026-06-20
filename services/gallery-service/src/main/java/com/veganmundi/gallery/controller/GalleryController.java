@@ -14,7 +14,6 @@ import java.util.Map;
  * GET /gallery
  */
 @RestController
-@CrossOrigin(origins = "*")
 public class GalleryController {
 
     @Autowired

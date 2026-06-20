@@ -24,7 +24,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/classes")
-@CrossOrigin(origins = "*")
 public class ClassController {
 
     @Autowired
