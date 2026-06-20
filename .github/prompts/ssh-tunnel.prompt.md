@@ -20,12 +20,11 @@ Ensure Jenkins EC2 is running and then open a local SSH tunnel for DBeaver acces
 
 ## Instructions
 1. Check EC2 instance state.
-2. If instance is stopped, start it.
-3. Wait until the instance is `running` and both status checks are `ok`.
-4. Verify Jenkins EIP still points to the same instance.
-5. Print and run the exact SSH tunnel command.
-6. Remind the user to keep the tunnel terminal open while using DBeaver.
-7. Show DBeaver connection parameters.
+2. If instance is stopped, start it and wait until `running` and both status checks are `ok`.
+3. Verify Jenkins EIP still points to the same instance.
+4. Run the SSH tunnel command in the terminal (use a background async terminal so it stays open).
+5. Confirm the local port 3307 is listening.
+6. Show DBeaver connection parameters.
 
 ## AWS CLI Commands
 
@@ -63,9 +62,14 @@ aws ec2 describe-addresses \
   --query "Addresses[0].{InstanceId:InstanceId,AssociationId:AssociationId,PublicIp:PublicIp}"
 ```
 
-### Open SSH tunnel
+### Open SSH tunnel (run in background terminal, keep open)
 ```bash
 ssh -i C:\\Todeschini\\Tech\\ssh\\jenkins.pem -N -L 3307:vegan-mundi-prod.cfsgis64go7a.us-east-2.rds.amazonaws.com:3306 ec2-user@3.135.174.31
+```
+
+### Verify local port is listening
+```bash
+Test-NetConnection 127.0.0.1 -Port 3307
 ```
 
 ## Output Format
