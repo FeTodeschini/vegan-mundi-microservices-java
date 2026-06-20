@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>vegan-mundi-order-confirmation-lambda</artifactId>
   <name>Vegan Mundi - Order Confirmation Lambda</name>
-  <description>AWS Lambda function for order confirmation emails and analytics</description>
+  <description>AWS Lambda function for order confirmation emails</description>
   <build>
     <plugins>
       <plugin>

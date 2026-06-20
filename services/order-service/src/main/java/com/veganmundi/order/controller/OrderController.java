@@ -1,55 +1,76 @@
 package com.veganmundi.order.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.HashMap;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.bind.annotation.*;
+
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Order API Endpoints
+ * Order endpoints — mirrors Node.js orderRouter/orderController exactly.
+ * POST /order/add
  */
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/order")
+@CrossOrigin(origins = "*")
 public class OrderController {
 
-    @GetMapping("/health")
-    public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> response = new HashMap<>();
-        response.put("service", "order-service");
-        response.put("status", "UP");
-        return ResponseEntity.ok(response);
-    }
+    @Autowired
+    private JdbcTemplate jdbc;
 
-    @PostMapping
-    public ResponseEntity<Map<String, String>> createOrder() {
-        // TODO: Implement order creation with EventBridge publishing
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Create order endpoint stub");
-        response.put("orderId", "order-123");
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+    // ── POST /order/add ───────────────────────────────────────────────────────
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, String>> getOrder(@PathVariable String id) {
-        // TODO: Implement order retrieval
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Get order endpoint stub");
-        response.put("orderId", id);
-        return ResponseEntity.ok(response);
-    }
+    @PostMapping("/add")
+    public ResponseEntity<?> addOrder(@RequestBody Map<String, Object> body) {
+        String orderNumber = (String) body.get("orderNumber");
+        String email       = (String) body.get("email");
+        List<?> classes    = (List<?>) body.get("classes");
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<Map<String, String>> updateOrderStatus(@PathVariable String id) {
-        // TODO: Implement status update
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Update order status endpoint stub");
-        response.put("orderId", id);
-        return ResponseEntity.ok(response);
+        if (classes == null || classes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "Invalid input for /order/add: expecting a non-empty array."));
+        }
+
+        try {
+            // Insert order
+            jdbc.update(
+                "INSERT INTO `ORDER` (ORDER_NUMBER, EMAIL, PAYMENT_METHOD_ID, ORDER_DATE) VALUES (?, ?, 'CRC', NOW())",
+                orderNumber, email
+            );
+
+            // Insert order classes (batch)
+            Timestamp now = new Timestamp(new Date().getTime());
+            for (Object item : classes) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> c = (Map<String, Object>) item;
+                jdbc.update(
+                    "INSERT INTO ORDER_CLASS (ORDER_NUMBER, EMAIL, CLASS_ID, DELIVERY_METHOD_ID, NUM_STUDENTS, PRICE, DISCOUNT_PERCENTAGE, CLASS_DATE, PURCHASE_DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    c.get("ORDER_NUMBER"),
+                    c.get("EMAIL"),
+                    c.get("CLASS_ID"),
+                    c.get("DELIVERY_METHOD_ID"),
+                    c.get("NUM_STUDENTS"),
+                    c.get("PRICE"),
+                    c.get("DISCOUNT_PERCENTAGE"),
+                    c.get("CLASS_DATE"),
+                    now
+                );
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message",     "Order added successfully",
+                "orderNumber", orderNumber,
+                "email",       email
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "We apologize. Your order could not be completed. " + e.getMessage()));
+        }
     }
 }
+

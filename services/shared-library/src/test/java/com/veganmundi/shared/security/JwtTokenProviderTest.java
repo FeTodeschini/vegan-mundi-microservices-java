@@ -10,22 +10,22 @@ class JwtTokenProviderTest {
 
     @Test
     void testTokenGeneration() {
-        String token = tokenProvider.generateToken("user-123", "test@example.com");
+        String token = tokenProvider.generateToken("Test", "User", "test@example.com");
         assertNotNull(token);
         assertFalse(token.isEmpty());
     }
 
     @Test
     void testTokenValidation() {
-        String token = tokenProvider.generateToken("user-123", "test@example.com");
+        String token = tokenProvider.generateToken("Test", "User", "test@example.com");
         assertTrue(tokenProvider.validateToken(token));
     }
 
     @Test
     void testTokenExtraction() {
-        String userId = "user-123";
-        String token = tokenProvider.generateToken(userId, "test@example.com");
-        assertEquals(userId, tokenProvider.getUserIdFromToken(token));
+        String email = "test@example.com";
+        String token = tokenProvider.generateToken("Test", "User", email);
+        assertEquals(email, tokenProvider.getEmailFromToken(token));
     }
 
     @Test

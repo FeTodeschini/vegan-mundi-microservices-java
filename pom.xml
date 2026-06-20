@@ -38,6 +38,9 @@
 
         <!-- Documentation -->
         <springdoc-openapi.version>2.0.2</springdoc-openapi.version>
+
+        <!-- Spring Cloud (for Gateway) -->
+        <spring-cloud.version>2022.0.4</spring-cloud.version>
     </properties>
 
     <modules>
@@ -50,6 +53,7 @@
         <module>services/gallery-service</module>
         <module>services/price-service</module>
         <module>lambda/order-confirmation</module>
+        <module>services/gateway</module>
     </modules>
 
     <dependencyManagement>
@@ -59,6 +63,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud BOM (Gateway) -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
