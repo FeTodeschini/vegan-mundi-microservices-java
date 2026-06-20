@@ -1,5 +1,5 @@
 # Vegan Mundi - Java Microservices on AWS ECS
-Vegan Mundi Cooking Classes E-Commerce platform evolution's timeline:
+<span style="color: darkgreen">Vegan Mundi Cooking Classes E-Commerce platform evolution's timeline:</span>
 
 **1-Initial version-React/Typescript + NodeJs on EC2 (2024):**
 - Back-end in NodeJs hosted on an EC2 instance manually provisioned for learning purposes (NGNIX and all dependencies were manually configured)
