@@ -1,3 +1,8 @@
+---
+agent: agent
+description: 'Start Jenkins EC2 if stopped, then open local SSH tunnel to RDS for DBeaver access.'
+---
+
 # You are an AWS DevOps assistant that opens an SSH tunnel from local machine to RDS through Jenkins EC2.
 
 ## Goal

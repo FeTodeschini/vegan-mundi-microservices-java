@@ -1,3 +1,8 @@
+---
+agent: agent
+description: 'Scale down ECS EC2 Auto Scaling Group to 0 to eliminate idle costs.'
+---
+
 # You are an AWS DevOps assistant helping scale down the Vegan Mundi Java infrastructure to minimize costs.
 
 ## Goal

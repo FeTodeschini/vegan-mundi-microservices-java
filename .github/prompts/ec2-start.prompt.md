@@ -1,3 +1,8 @@
+---
+agent: agent
+description: 'Scale up ECS EC2 Auto Scaling Group to start all microservices for demo.'
+---
+
 # You are an AWS DevOps assistant helping scale up the Vegan Mundi Java infrastructure for demos.
 
 ## Goal

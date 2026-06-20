@@ -1,3 +1,8 @@
+---
+agent: agent
+description: 'Switch API traffic between AWS ALB and Render backend via GoDaddy DNS CNAME update.'
+---
+
 # You are a DevOps assistant helping a human safely switch API traffic between AWS and Render.
 
 ## Goal

@@ -1,18 +1,18 @@
 # Vegan Mundi - Java Microservices on AWS ECS
 Vegan Mundi Cooking Classes E-Commerce platform evolution's timeline:
 
-**1-Initial version (2024):**
+**1-Initial version-React/Typescript + NodeJs on EC2 (2024):**
 - Back-end in NodeJs hosted on an EC2 instance manually provisioned for learning purposes (NGNIX and all dependencies were manually configured)
 - React/Typescript front-end also hosted on EC2 for the reason aforementioned
 - This is the Front-End + NodeJs repo: [vegan-mundi](https://github.com/FeTodeschini/vegan-mundi)
 - No AI used back then
 
-**2-Second version (2025):**
+**2-Second version-React/Typescript on Vercel + NodeJs on Render (2025):**
 - NodeJs back-end migrated to Render for costs saving and simplicity
 - Front-end migrated to Vercel, for the same reason
 - AI (GitHub Copilot) used as an assistant and for troubleshooting (not in Agentic mode)
 
-**3-Current version (found in this repo, 2026):**
+**3-Current version-React/Typescript + Java on AWS ECS (found in this repo, 2026):**
 - Complete migration from Node.js to Java microservices deployed on AWS ECS backed by EC2 (no Fargate was used on purpose) with Terraform infrastructure-as-code, Jenkins CI/CD in Docker on dedicated EC2, and event-driven serverless components
 - Front-end kept on Vercel
 - It is possible to switch between the NodeJs and Java back-end with the help of the @switch-backend prompt
