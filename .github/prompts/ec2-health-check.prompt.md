@@ -97,12 +97,12 @@ Provide structured health report:
 #### Logs & Alarms
 - ✅ No critical alarms
 - ⚠️ 2 warnings in order-service logs (slow queries)
-- 📝 See `@copilot-log-analyzer` for details
+- 📝 See `/log-analyzer` for details
 
 #### Recommendations
 If issues found:
-- `@copilot-log-analyzer` for detailed triage
-- `@copilot-ec2-stop` then `@copilot-ec2-start` for full restart
+- `/log-analyzer` for detailed triage
+- `/ec2-stop` then `/ec2-start` for full restart
 - Contact AWS support if RDS issues persist
 
 ---

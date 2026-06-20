@@ -15,7 +15,7 @@
 **3-Current version-React/Typescript + Java on AWS ECS (found in this repo, 2026):**
 - Complete migration from Node.js to Java microservices deployed on AWS ECS backed by EC2 (no Fargate was used on purpose) with Terraform infrastructure-as-code, Jenkins CI/CD in Docker on dedicated EC2, and event-driven serverless components
 - Front-end kept on Vercel
-- It is possible to switch between the NodeJs and Java back-end with the help of the @switch-backend prompt
+- It is possible to switch between the NodeJs and Java back-end with the /backend-switch prompt
 - AI (GitHub Copilot) fully used on Agentic Mode, leveraging prompts for repetitive tasks
 
 ## Quick Overview
@@ -77,7 +77,7 @@ vegan-mundi-microservices-java/
 ├── jenkins/              # CI/CD pipeline configuration
 ├── docker/               # Container configurations
 ├── docs/                 # Architecture & documentation
-└── .github/copilot/      # GitHub Copilot AI agents
+└── .github/prompts/      # GitHub Copilot slash prompts
 ```
 
 ## 🏗️ Architecture
@@ -121,29 +121,32 @@ vegan-mundi-microservices-java/
 
 ## 🤖 AI-Assisted DevOps (GitHub Copilot)
 
-Custom Copilot agents for cost optimization and operational efficiency:
+Custom Copilot prompts for cost optimization and operational efficiency:
 
 ```bash
 # Start Jenkins EC2 (if stopped) and open an SSH tunnel for local DB Connection trough this EC2, as RDS is on a private subnet for security reasons and cannot be publicly acessed
 @ssh-tunnel
 
-# Guide humans on how to switch the back-end from NodeJs on Render to JAva on AWS ECS (and vice-versa)
-@backend-swicth
+# Guide humans on how to switch the back-end from NodeJs on Render to Java on AWS ECS (and vice-versa)
+/backend-switch
+
+# Toggle ASG state (enable/disable) with confirmation and verification
+/auto-scaling-toggle
 
 # Start EC2 infrastructure for demo
-@copilot-ec2-start
+/ec2-start
 
 # Stop EC2 infrastructure to save costs
-@copilot-ec2-stop
+/ec2-stop
 
 # Check service health
-@copilot-ec2-health-check
+/ec2-health-check
 
 # Analyze CloudWatch logs for issues
-@copilot-log-analyzer
+/log-analyzer
 
 # Review Terraform plan before apply
-@copilot-terraform-plan-reviewer
+/terraform-plan-reviewer
 ```
 
 See [.github/copilot/README.md](.github/copilot/README.md) for usage details.

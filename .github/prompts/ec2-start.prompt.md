@@ -53,7 +53,7 @@ Provide structured response:
 ⏱️ **Estimated Time**: 2-3 minutes for startup
 💰 **Cost**: micro-sized instance cost; verify current AWS regional pricing before use
 
-**Next Step**: Run `@copilot-ec2-health-check` to verify all services are healthy
+**Next Step**: Run `/ec2-health-check` to verify all services are healthy
 
 ---
 

@@ -116,7 +116,7 @@ Provide structured analysis:
 
 **Recommended Actions**:
 1. Increase connection pool: `spring.datasource.hikari.maximum-pool-size=50`
-2. Check for slow queries: `@copilot-terraform-plan-reviewer` (scale up RDS)
+2. Check for slow queries: `/terraform-plan-reviewer` (scale up RDS)
 3. Restart affected service to clear connections
 
 **View detailed logs?** (yes/no)

@@ -83,11 +83,11 @@ Production Environment (3× t3.micro per hour):
 💚 **Daily Savings**: ~$1.13 (dev) or $3.36 (prod)
 📅 **Monthly Savings**: ~$34 (dev) or $100 (prod)
 
-**Important**: Services will be unavailable until restarted with `@copilot-ec2-start`
+**Important**: Services will be unavailable until restarted with `/ec2-start` (or `/auto-scaling-toggle` with enable).
 
 **Next Steps**: 
 - Data persists in MySQL (not affected by EC2 scaling)
-- To resume: Run `@copilot-ec2-start`
+- To resume: Run `/ec2-start` or `/auto-scaling-toggle` and choose `enable`
 - Setup automation: Schedule this command daily in cron/Lambda
 
 ---

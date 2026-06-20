@@ -1,20 +1,19 @@
-# GitHub Copilot DevOps Agents
+# GitHub Copilot DevOps Prompts
 
-Custom GitHub Copilot instruction files for automating DevOps tasks and cost optimization.
+Custom GitHub Copilot slash prompts for automating DevOps tasks and cost optimization.
 
 ## Quick Reference
 
-| Agent | Prompt | Use Case |
+| Prompt | Slash Command | Use Case |
 |---|---|---|
-| **EC2 Start** | `@copilot-ec2-start` | Scale up ECS infrastructure for demo |
-| **EC2 Stop** | `@copilot-ec2-stop` | Scale down to $0 to save costs |
-| **Health Check** | `@copilot-ec2-health-check` | Verify all services operational |
-| **Log Analyzer** | `@copilot-log-analyzer` | Triage CloudWatch issues |
-| **Terraform Reviewer** | `@copilot-terraform-plan-reviewer` | Review infrastructure changes safely |
-| **DNS Switch to AWS** | `@copilot-dns-switch-to-aws` | Point `api` CNAME to AWS ALB for demo mode |
-| **DNS Switch to Render** | `@copilot-dns-switch-to-render` | Point `api` CNAME back to Render for normal mode |
-| **Backend Switch** | `@copilot-backend-switch` | Ask AWS or Render and produce full human runbook with rollback |
-| **SSH Tunnel Jenkins** | `@copilot-ssh-tunnel-jenkis` | Start Jenkins EC2 if needed, then open local RDS tunnel via bastion |
+| **EC2 Start** | `/ec2-start` | Scale up ECS infrastructure for demo |
+| **EC2 Stop** | `/ec2-stop` | Scale down to $0 to save costs |
+| **ASG State Toggle** | `/auto-scaling-toggle` | Enable or disable ECS ASG capacity with verification |
+| **Health Check** | `/ec2-health-check` | Verify all services operational |
+| **Log Analyzer** | `/log-analyzer` | Triage CloudWatch issues |
+| **Terraform Reviewer** | `/terraform-plan-reviewer` | Review infrastructure changes safely |
+| **Backend Switch** | `/backend-switch` | Ask AWS or Render and produce full human runbook with rollback |
+| **SSH Tunnel Jenkins** | `/ssh-tunnel` | Start Jenkins EC2 if needed, then open local RDS tunnel via bastion |
 
 ## Prerequisites
 
@@ -27,7 +26,7 @@ Custom GitHub Copilot instruction files for automating DevOps tasks and cost opt
 
 ### Start Demo Environment
 ```
-User: @copilot-ec2-start
+User: /ec2-start
 
 Copilot: Which environment? (dev/test/prod)
 > dev
@@ -40,7 +39,7 @@ Copilot: Starting 2 t3.micro instances in dev cluster...
 
 ### Stop to Save Costs
 ```
-User: @copilot-ec2-stop
+User: /ec2-stop
 
 Copilot: Scaling dev cluster to 0 to save ~$0.67/day...
 [checks for active connections]
@@ -51,7 +50,7 @@ Copilot: Scaling dev cluster to 0 to save ~$0.67/day...
 
 ### Check Service Health
 ```
-User: @copilot-ec2-health-check
+User: /ec2-health-check
 
 Copilot: Checking infrastructure health...
 - ALB: Healthy (7 healthy targets, 0 unhealthy)
@@ -64,7 +63,7 @@ Copilot: Checking infrastructure health...
 
 ### Analyze Recent Errors
 ```
-User: @copilot-log-analyzer
+User: /log-analyzer
 
 Copilot: Which service? (account/class/order/etc)
 > order
@@ -80,7 +79,7 @@ Show detailed logs? (yes/no)
 
 ### Review Infrastructure Plan
 ```
-User: @copilot-terraform-plan-reviewer
+User: /terraform-plan-reviewer
 
 Copilot: Parsing terraform plan...
 
@@ -97,6 +96,25 @@ Changes summary:
 Approve changes? (yes/no)
 ```
 
+### Toggle ASG State (Enable or Disable)
+```
+User: /auto-scaling-toggle
+
+Copilot: Which environment? (dev/test/prod)
+> dev
+
+Copilot: Enable or disable auto scaling capacity?
+> disable
+
+Copilot: Scale ECS services to 0 first? (recommended)
+> yes
+
+Copilot: Confirm execution?
+> yes
+
+Copilot: Executing and verifying final ASG state...
+```
+
 ## Cost Savings Example
 
 **Dev Environment Costs**
@@ -104,9 +122,9 @@ Approve changes? (yes/no)
 - With EC2 start/stop: ~$2-3/month
 
 **Usage Pattern**
-- Start in morning: `@copilot-ec2-start` → 2 min startup
+- Start in morning: `/ec2-start` → 2 min startup
 - Work for 8 hours: Services running
-- Stop at end of day: `@copilot-ec2-stop` → 1 min cleanup
+- Stop at end of day: `/ec2-stop` or `/auto-scaling-toggle` (disable) → 1 min cleanup
 - **Monthly savings: ~$18 (90% reduction)**
 
 ## Integration with Workflows
@@ -131,11 +149,11 @@ These agents work best in:
 ```
 User: Start the demo, check health, and show logs
 
-@copilot-ec2-start → wait 2 min → @copilot-ec2-health-check → @copilot-log-analyzer
+/ec2-start → wait 2 min → /ec2-health-check → /log-analyzer
 ```
 
 ### CI/CD Integration (Future)
-These agents can be triggered from GitHub Actions or Jenkins:
+These prompts can be integrated from GitHub Actions or Jenkins:
 ```bash
 # Example: Stop infrastructure after test run
 aws-cli ec2 scale-to-zero --environment dev
