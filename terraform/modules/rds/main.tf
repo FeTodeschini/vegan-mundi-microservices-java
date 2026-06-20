@@ -186,3 +186,11 @@ output "db_name" {
 output "db_security_group_id" {
   value = aws_security_group.rds.id
 }
+
+output "db_subnet_group_name" {
+  value = aws_db_subnet_group.main.name
+}
+
+output "db_publicly_accessible" {
+  value = aws_db_instance.main.publicly_accessible
+}

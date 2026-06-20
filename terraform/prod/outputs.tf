@@ -62,3 +62,13 @@ output "db_name" {
   value       = module.rds.db_name
   description = "RDS database name"
 }
+
+output "db_subnet_group_name" {
+  value       = module.rds.db_subnet_group_name
+  description = "RDS DB subnet group name"
+}
+
+output "db_publicly_accessible" {
+  value       = module.rds.db_publicly_accessible
+  description = "Whether RDS is publicly accessible"
+}

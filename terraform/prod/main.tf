@@ -94,7 +94,7 @@ module "rds" {
 
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
-  subnet_ids                = var.db_publicly_accessible ? module.vpc.public_subnet_ids : module.vpc.private_subnet_ids
+  subnet_ids                = module.vpc.public_subnet_ids
   allowed_security_group_id = module.ecs.ecs_instance_security_group_id
   allowed_cidr_blocks       = var.db_allowed_cidr_blocks
 
@@ -103,7 +103,7 @@ module "rds" {
   db_password             = var.db_password
   db_instance_class       = var.db_instance_class
   allocated_storage       = var.db_allocated_storage
-  publicly_accessible     = var.db_publicly_accessible
+  publicly_accessible     = true
   skip_final_snapshot     = var.db_skip_final_snapshot
   backup_retention_period = var.db_backup_retention_period
 
