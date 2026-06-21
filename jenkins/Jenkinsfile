@@ -210,7 +210,7 @@ pipeline {
         }
 
         success {
-            echo "✅ Deployment successful to ${ENVIRONMENT}"
+            echo "✅ Deployment successful to ${params.ENVIRONMENT}"
         }
 
         failure {
@@ -222,7 +222,7 @@ pipeline {
                     '''
                 }
             }
-            echo "❌ Deployment failed to ${ENVIRONMENT}"
+            echo "❌ Deployment failed to ${params.ENVIRONMENT}"
         }
     }
 }
