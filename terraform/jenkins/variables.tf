@@ -23,7 +23,7 @@ variable "public_subnet_id" {
 variable "instance_type" {
   type        = string
   description = "EC2 instance type for Jenkins host"
-  default     = "t3.micro"
+  default     = "t3.medium"
 }
 
 variable "key_name" {
