@@ -123,3 +123,8 @@ variable "db_seed_file" {
   description = "Path to SQL seed file used by DB bootstrap"
   default     = "../../db/seed/seed.sql"
 }
+
+variable "lambda_package_path" {
+  type        = string
+  description = "Path to the built Lambda deployment artifact (JAR/ZIP)."
+}

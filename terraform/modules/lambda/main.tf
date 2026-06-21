@@ -9,6 +9,11 @@ variable "iam_role_arn" {
   type = string
 }
 
+variable "lambda_package_path" {
+  type        = string
+  description = "Path to the built Lambda deployment artifact (JAR/ZIP)."
+}
+
 resource "aws_lambda_function" "order_confirmation" {
   function_name = "vegan-mundi-order-confirmation-${var.environment}"
   role          = var.iam_role_arn
@@ -17,9 +22,8 @@ resource "aws_lambda_function" "order_confirmation" {
   memory_size   = 512
   timeout       = 30
 
-  # Placeholder package for initial infra provisioning.
-  filename         = "${path.module}/placeholder/lambda-placeholder.zip"
-  source_code_hash = filebase64sha256("${path.module}/placeholder/lambda-placeholder.zip")
+  filename         = var.lambda_package_path
+  source_code_hash = filebase64sha256(var.lambda_package_path)
 
   environment {
     variables = {

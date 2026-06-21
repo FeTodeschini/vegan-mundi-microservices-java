@@ -53,3 +53,8 @@ variable "certificate_arn" {
   type        = string
   description = "ACM certificate ARN for HTTPS (required if enable_https=true)"
 }
+
+variable "lambda_package_path" {
+  type        = string
+  description = "Path to the built Lambda deployment artifact (JAR/ZIP)."
+}

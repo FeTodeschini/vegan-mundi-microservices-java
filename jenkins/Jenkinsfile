@@ -202,19 +202,6 @@ pipeline {
             }
         }
 
-        stage('Rollback on Failure') {
-            when {
-                failure()
-            }
-            steps {
-                script {
-                    sh '''
-                        echo "⚠️ Deployment failed, initiating rollback..."
-                        bash jenkins/scripts/rollback.sh ${ENVIRONMENT}
-                    '''
-                }
-            }
-        }
     }
 
     post {
@@ -227,6 +214,14 @@ pipeline {
         }
 
         failure {
+            script {
+                if (params.DRY_RUN == false) {
+                    sh '''
+                        echo "⚠️ Deployment failed, initiating rollback..."
+                        bash jenkins/scripts/rollback.sh ${ENVIRONMENT}
+                    '''
+                }
+            }
             echo "❌ Deployment failed to ${ENVIRONMENT}"
         }
     }
