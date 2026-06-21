@@ -2,7 +2,7 @@
 set -euxo pipefail
 
 dnf update -y
-dnf install -y docker git
+dnf install -y docker git java-21-amazon-corretto-devel maven
 
 # Some AL2023 mirrors do not publish docker-compose-plugin as a separate package.
 # Docker package already includes the Compose v2 subcommand on current AL2023 images.
@@ -18,6 +18,9 @@ fi
 
 systemctl enable --now docker
 usermod -aG docker ec2-user
+
+java -version
+mvn -version
 
 mkdir -p /opt/jenkins
 chown -R ec2-user:ec2-user /opt/jenkins
