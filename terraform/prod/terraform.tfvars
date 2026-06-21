@@ -29,3 +29,6 @@ db_seed_file               = "../../db/seed/seed.sql"
 # TLS
 enable_https    = false
 # certificate_arn = "arn:aws:acm:us-east-2:123456789:certificate/xxxxx"
+
+# Lambda artifact produced by: mvn -pl lambda/order-confirmation -DskipTests package
+lambda_package_path = "../../lambda/order-confirmation/target/vegan-mundi-order-confirmation-lambda.jar"

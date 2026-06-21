@@ -78,8 +78,9 @@ module "cloudwatch" {
 module "lambda" {
   source = "../modules/lambda"
 
-  environment = var.environment
-  iam_role_arn = module.iam.lambda_execution_role_arn
+  environment         = var.environment
+  iam_role_arn        = module.iam.lambda_execution_role_arn
+  lambda_package_path = var.lambda_package_path
 }
 
 module "eventbridge" {
