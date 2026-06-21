@@ -11,9 +11,14 @@ pipeline {
     }
 
     environment {
+        ENV = "${params.ENVIRONMENT}"
         AWS_REGION = 'us-east-2'
+        AWS_ACCOUNT_ID = "${params.AWS_ACCOUNT_ID}"
         REGISTRY = "${params.AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         REGISTRY_URL = "https://${REGISTRY}"
+        CLUSTER = "vegan-mundi-${params.ENVIRONMENT}-cluster"
+        SERVICES = 'account-service class-service order-service review-service delivery-service gallery-service price-service'
+        MAVEN_OPTS = '-Xms128m -Xmx384m -XX:+UseSerialGC -Djava.awt.headless=true'
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -42,10 +47,11 @@ pipeline {
                 script {
                     sh '''
                         echo "Building all services..."
+                        echo "MAVEN_OPTS=${MAVEN_OPTS}"
                         if [ "${SKIP_TESTS}" = "false" ]; then
-                            mvn clean package
+                            mvn -T 1 -ntp clean package
                         else
-                            mvn clean package -DskipTests
+                            mvn -T 1 -ntp clean package -DskipTests
                         fi
                     '''
                 }
@@ -60,9 +66,7 @@ pipeline {
                         aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${REGISTRY}
                         
                         echo "Building Docker images..."
-                        SERVICES=("account-service" "class-service" "order-service" "review-service" "delivery-service" "gallery-service" "price-service")
-                        
-                        for service in "${SERVICES[@]}"; do
+                        for service in ${SERVICES}; do
                             echo "Building ${service}..."
                             docker build -t ${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG} services/${service}/
                             docker tag ${REGISTRY}/vegan-mundi-${service}:${IMAGE_TAG} ${REGISTRY}/vegan-mundi-${service}:latest
@@ -133,10 +137,8 @@ pipeline {
                 script {
                     sh '''
                         echo "Deploying services to ECS..."
-                        SERVICES=("account-service" "class-service" "order-service" "review-service" "delivery-service" "gallery-service" "price-service")
-                        CLUSTER="vegan-mundi-${ENVIRONMENT}-cluster"
                         
-                        for service in "${SERVICES[@]}"; do
+                        for service in ${SERVICES}; do
                             echo "Updating ${service} on ${CLUSTER}..."
                             
                             # Get current task definition
