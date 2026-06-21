@@ -8,7 +8,7 @@ availability_zones = ["us-east-2a", "us-east-2b"]
 enable_nat         = true
 
 # Compute
-instance_type     = "t3.micro"
+instance_type     = "t3.medium"
 desired_capacity  = 2
 min_capacity      = 2
 max_capacity      = 3
