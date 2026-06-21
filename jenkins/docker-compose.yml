@@ -17,7 +17,8 @@ services:
       JENKINS_REPO_URL: ${JENKINS_REPO_URL}
       JENKINS_REPO_BRANCH: ${JENKINS_REPO_BRANCH}
       JENKINS_JENKINSFILE_PATH: ${JENKINS_JENKINSFILE_PATH}
-      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false -Xms256m -Xmx768m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djava.awt.headless=true
+      MAVEN_OPTS: -Xms128m -Xmx512m -XX:+UseG1GC
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
