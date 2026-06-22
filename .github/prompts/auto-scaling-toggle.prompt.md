@@ -1,93 +1,74 @@
 ---
 agent: agent
-description: 'Enable or disable ECS EC2 Auto Scaling Group capacity for an environment, then execute and verify.'
+description: 'Scale ECS state down to zero or restore previous state with a single parameter (up|down).'
 ---
 
-# You are an AWS DevOps assistant that toggles ECS EC2 Auto Scaling Group state.
+# You are an AWS DevOps assistant for ECS capacity state toggling.
 
 ## Goal
-Ask whether to enable or disable auto scaling capacity for a selected environment, execute the requested action, and verify final state.
+Run one script with a single required parameter:
+- `down`: save current ECS service desired counts and ASG settings, then scale services/ASG down to 0 and lock relaunch-related ASG processes.
+- `up`: restore ECS service desired counts from saved state, restore ASG to fixed baseline values (default min=2 desired=2 max=6), and resume launch-related ASG processes back to normal.
 
-## Fixed Defaults
-- Region: `us-east-2`
-- ASG name pattern: `vegan-mundi-{ENVIRONMENT}-ecs-asg`
-- ECS cluster pattern: `vegan-mundi-{ENVIRONMENT}-cluster`
-- ECS service pattern: `vegan-mundi-{SERVICE}-service`
-- Known services: `account class order review delivery gallery price`
+## Required Input
+- A single parameter named `state` with value `down` or `up`.
 
-## Required Interaction
-1. Ask for environment: `dev`, `test`, or `prod`.
-2. Ask action: `enable` or `disable`.
-3. If `enable`, ask desired values for ASG `min`, `desired`, and `max`.
-4. If `disable`, ask whether to scale ECS services to `0` first (recommended).
-5. Ask final confirmation before execution.
+If `state` is missing or not one of `down|up`, ask the user to provide it and stop.
 
 ## Execution Rules
-- Execute commands, do not only print them.
-- Use AWS CLI in terminal.
-- After each action, verify and report resulting ASG values.
-- If a command fails, stop and show the exact error with a suggested fix.
+1. Execute commands, do not only print them.
+2. Use the repository script only:
+   - `bash scripts/auto-scale-state.sh down`
+   - `bash scripts/auto-scale-state.sh up`
+3. Use current shell variables if present (`REGION`, `CLUSTER`), otherwise script defaults apply.
+4. After execution, verify and report:
+   - ECS service desired/running summary
+   - ASG min/desired/max/current instance count
 
-## Commands
+## Verification Commands
 
-### Check current ASG state
 ```bash
-aws autoscaling describe-auto-scaling-groups \
-  --auto-scaling-group-names vegan-mundi-{ENVIRONMENT}-ecs-asg \
-  --region us-east-2 \
-  --query "AutoScalingGroups[0].{Name:AutoScalingGroupName,Min:MinSize,Desired:DesiredCapacity,Max:MaxSize,Instances:length(Instances)}"
+aws --no-cli-pager ecs describe-services \
+  --region ${REGION:-us-east-2} \
+  --cluster ${CLUSTER:-vegan-mundi-prod-cluster} \
+  --services \
+    vegan-mundi-account-service \
+    vegan-mundi-class-service \
+    vegan-mundi-order-service \
+    vegan-mundi-review-service \
+    vegan-mundi-delivery-service \
+    vegan-mundi-gallery-service \
+    vegan-mundi-price-service \
+    vegan-mundi-gateway \
+  --query "services[].{name:serviceName,desired:desiredCount,running:runningCount}" \
+  --output table
 ```
 
-### Disable path (recommended full stop)
-
-#### Optional: scale ECS services to 0 first
 ```bash
-for service in account class order review delivery gallery price; do
-  aws ecs update-service \
-    --cluster vegan-mundi-{ENVIRONMENT}-cluster \
-    --service vegan-mundi-${service}-service \
-    --desired-count 0 \
-    --region us-east-2
-done
-```
+CP=$(aws --no-cli-pager ecs describe-clusters \
+  --region ${REGION:-us-east-2} \
+  --clusters ${CLUSTER:-vegan-mundi-prod-cluster} \
+  --query "clusters[0].defaultCapacityProviderStrategy[0].capacityProvider" \
+  --output text)
+ASG_ARN=$(aws --no-cli-pager ecs describe-capacity-providers \
+  --region ${REGION:-us-east-2} \
+  --capacity-providers "$CP" \
+  --query "capacityProviders[0].autoScalingGroupProvider.autoScalingGroupArn" \
+  --output text)
+ASG_NAME=${ASG_ARN##*/}
 
-#### Set ASG to 0/0/0 to prevent relaunch
-```bash
-aws autoscaling update-auto-scaling-group \
-  --auto-scaling-group-name vegan-mundi-{ENVIRONMENT}-ecs-asg \
-  --min-size 0 \
-  --desired-capacity 0 \
-  --max-size 0 \
-  --region us-east-2
-```
-
-### Enable path (resume capacity)
-
-#### Set ASG to user-provided values
-```bash
-aws autoscaling update-auto-scaling-group \
-  --auto-scaling-group-name vegan-mundi-{ENVIRONMENT}-ecs-asg \
-  --min-size {MIN} \
-  --desired-capacity {DESIRED} \
-  --max-size {MAX} \
-  --region us-east-2
-```
-
-## Verification
-Run after either path:
-
-```bash
-aws autoscaling describe-auto-scaling-groups \
-  --auto-scaling-group-names vegan-mundi-{ENVIRONMENT}-ecs-asg \
-  --region us-east-2 \
-  --query "AutoScalingGroups[0].{Min:MinSize,Desired:DesiredCapacity,Max:MaxSize,Instances:length(Instances),Health:Instances[*].HealthStatus}"
+aws --no-cli-pager autoscaling describe-auto-scaling-groups \
+  --region ${REGION:-us-east-2} \
+  --auto-scaling-group-names "$ASG_NAME" \
+  --query "AutoScalingGroups[0].{name:AutoScalingGroupName,min:MinSize,desired:DesiredCapacity,max:MaxSize,current:length(Instances)}" \
+  --output table
 ```
 
 ## Output Format
-
-- Environment selected
-- Action selected
-- Commands executed
-- Final ASG state (`min/desired/max`, instance count)
-- If disabled: reminder that manual EC2 stop is unnecessary while ASG is 0/0/0
-- If enabled: reminder to restore ECS service desired counts if needed
+- Parameter received: `state`
+- Script executed
+- ECS service summary
+- ASG summary
+- Final note:
+  - If `down`: no new EC2 should launch because ASG min/desired/max are set to 0 and relaunch processes are suspended.
+  - If `up`: ASG config is restored to fixed baseline values (default min=2 desired=2 max=6; overridable via env `ASG_RESTORE_MIN`, `ASG_RESTORE_DESIRED`, `ASG_RESTORE_MAX`) and launch behavior is resumed.

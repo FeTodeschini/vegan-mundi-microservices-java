@@ -1,0 +1,31 @@
+{
+  "savedAt": "2026-06-22T01:28:11Z",
+  "cluster": "vegan-mundi-prod-cluster",
+  "region": "us-east-2",
+  "capacityProvider": "vegan-mundi-prod-capacity-provider",
+  "asgName": "vegan-mundi-prod-ecs-asg",
+  "asg": {
+    "min": 2,
+    "desired": 2,
+    "max": 6,
+    "preSuspended": [],
+    "lockProcesses": [
+      "Launch",
+      "AlarmNotification",
+      "ScheduledActions",
+      "ReplaceUnhealthy",
+      "AZRebalance",
+      "InstanceRefresh"
+    ]
+  },
+  "services": {
+    "vegan-mundi-account-service": 0,
+    "vegan-mundi-class-service": 0,
+    "vegan-mundi-order-service": 0,
+    "vegan-mundi-review-service": 0,
+    "vegan-mundi-delivery-service": 0,
+    "vegan-mundi-gallery-service": 0,
+    "vegan-mundi-price-service": 0,
+    "vegan-mundi-gateway": 0
+  }
+}
