@@ -94,6 +94,12 @@ variable "db_allowed_cidr_blocks" {
   default     = []
 }
 
+variable "allow_ecs_to_rds_ingress" {
+  type        = bool
+  description = "Allow ECS security group ingress to RDS"
+  default     = true
+}
+
 variable "db_skip_final_snapshot" {
   type        = bool
   description = "Skip final snapshot on destroy"

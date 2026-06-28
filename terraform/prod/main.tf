@@ -96,7 +96,7 @@ module "rds" {
   environment               = var.environment
   vpc_id                    = module.vpc.vpc_id
   subnet_ids                = module.vpc.public_subnet_ids
-  allowed_security_group_id = module.ecs.ecs_instance_security_group_id
+  allowed_security_group_id = var.allow_ecs_to_rds_ingress ? module.ecs.ecs_instance_security_group_id : null
   allowed_cidr_blocks       = var.db_allowed_cidr_blocks
 
   db_name                 = var.db_name

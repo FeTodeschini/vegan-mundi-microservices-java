@@ -5,7 +5,7 @@ aws_region  = "us-east-2"
 # Networking (dedicated prod VPC)
 vpc_cidr           = "10.1.0.0/16"
 availability_zones = ["us-east-2a", "us-east-2b"]
-enable_nat         = true
+enable_nat         = false
 
 # Compute
 instance_type     = "t3.medium"
@@ -20,6 +20,7 @@ db_instance_class          = "db.t3.micro"
 db_allocated_storage       = 20
 db_publicly_accessible     = true
 db_allowed_cidr_blocks     = ["76.98.179.193/32", "74.220.50.0/24", "74.220.58.0/24"]
+allow_ecs_to_rds_ingress   = false
 db_skip_final_snapshot     = false
 db_backup_retention_period = 0
 bootstrap_db               = false
