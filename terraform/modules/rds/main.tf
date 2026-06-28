@@ -81,11 +81,6 @@ variable "db_seed_file" {
   default = ""
 }
 
-variable "protect_from_destroy" {
-  type    = bool
-  default = false
-}
-
 resource "aws_security_group" "rds" {
   name        = "vegan-mundi-${var.environment}-rds-sg"
   description = "RDS MySQL security group"
@@ -156,10 +151,6 @@ resource "aws_db_instance" "main" {
   tags = {
     Name        = "vegan-mundi-${var.environment}"
     Environment = var.environment
-  }
-
-  lifecycle {
-    prevent_destroy = var.protect_from_destroy
   }
 }
 

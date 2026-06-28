@@ -107,7 +107,6 @@ module "rds" {
   publicly_accessible     = true
   skip_final_snapshot     = var.db_skip_final_snapshot
   backup_retention_period = var.db_backup_retention_period
-  protect_from_destroy    = var.protect_rds_from_destroy
 
   bootstrap_db   = var.bootstrap_db
   db_schema_file = var.db_schema_file
