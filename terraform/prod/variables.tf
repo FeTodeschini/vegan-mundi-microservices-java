@@ -112,6 +112,12 @@ variable "db_backup_retention_period" {
   default     = 7
 }
 
+variable "protect_rds_from_destroy" {
+  type        = bool
+  description = "Prevent accidental destroy of the prod RDS instance"
+  default     = true
+}
+
 variable "bootstrap_db" {
   type        = bool
   description = "Populate DB schema/data after RDS provisioning"

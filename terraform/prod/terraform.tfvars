@@ -23,6 +23,7 @@ db_allowed_cidr_blocks     = ["76.98.179.193/32", "74.220.50.0/24", "74.220.58.0
 allow_ecs_to_rds_ingress   = false
 db_skip_final_snapshot     = false
 db_backup_retention_period = 0
+protect_rds_from_destroy   = true
 bootstrap_db               = false
 db_schema_file             = "../../db/ddl/all-tables.sql"
 db_seed_file               = "../../db/seed/seed.sql"

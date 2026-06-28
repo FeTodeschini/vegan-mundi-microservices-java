@@ -9,6 +9,11 @@ variable "services" {
   type = list(string)
 }
 
+variable "force_delete" {
+  type    = bool
+  default = true
+}
+
 data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
@@ -18,6 +23,7 @@ resource "aws_ecr_repository" "services" {
 
   name                 = "vegan-mundi-${each.key}"
   image_tag_mutability = "MUTABLE"
+  force_delete         = var.force_delete
 
   image_scanning_configuration {
     scan_on_push = true
